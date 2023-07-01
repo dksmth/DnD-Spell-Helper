@@ -29,7 +29,7 @@ fun ItemForList(
     modifier: Modifier = Modifier,
 ) {
 
-    val color = if (spell.favourite) Color(0xFFDC95F5) else Color.Black
+    val color = if (spell.favourite) Color(0xFFE49328) else Color.Black
 
     Row(
         modifier = modifier
