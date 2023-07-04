@@ -17,9 +17,9 @@ import androidx.compose.ui.unit.sp
 import com.example.dndspellhelper.models.PlayerCharacter
 
 @Composable
-fun CharacterItem(playerCharacter: PlayerCharacter) {
+fun CharacterItem(playerCharacter: PlayerCharacter, modifier: Modifier = Modifier) {
     Row(
-        Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 10.dp)
             .height(60.dp),
@@ -56,7 +56,7 @@ fun CharacterItem(playerCharacter: PlayerCharacter) {
         Spacer(Modifier.width(10.dp))
 
         Text(
-            text = playerCharacter.level,
+            text = playerCharacter.level.toString(),
             fontSize = 30.sp
         )
     }

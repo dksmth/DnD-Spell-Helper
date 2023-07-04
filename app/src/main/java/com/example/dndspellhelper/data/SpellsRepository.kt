@@ -2,7 +2,8 @@ package com.example.dndspellhelper.data
 
 import com.example.dndspellhelper.data.local.SpellsDatabase
 import com.example.dndspellhelper.data.remote.SpellsApi
-import com.example.dndspellhelper.data.remote.dto.SpellDto
+import com.example.dndspellhelper.data.remote.dto.character_level.ClassLevel
+import com.example.dndspellhelper.data.remote.dto.spell.SpellDto
 import com.example.dndspellhelper.models.PlayerCharacter
 import com.example.dndspellhelper.models.Spell
 import javax.inject.Inject
@@ -38,7 +39,14 @@ class SpellsRepository @Inject constructor(
 
     suspend fun getAllFavourites() = dao.getFavouriteSpells(true)
 
-    suspend fun insertCharacter(playerCharacter: PlayerCharacter) = dao.insertCharacter(playerCharacter)
+    suspend fun insertCharacter(playerCharacter: PlayerCharacter) =
+        dao.insertCharacter(playerCharacter)
 
     suspend fun getAllCharacters(): List<PlayerCharacter> = dao.getAllCharacters()
+
+    private suspend fun getFullSpellcasting(className: String): ArrayList<ClassLevel> =
+        api.getSpellcastingForClass(className)
+
+    suspend fun getSpellcastingForClassAndLevel(className: String, level: Int): ClassLevel =
+        getFullSpellcasting(className)[level]
 }

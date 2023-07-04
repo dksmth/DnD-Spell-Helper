@@ -1,6 +1,6 @@
 package com.example.dndspellhelper.data
 
-import com.example.dndspellhelper.data.remote.dto.SpellDto
+import com.example.dndspellhelper.data.remote.dto.spell.SpellDto
 import com.example.dndspellhelper.models.Spell
 
 fun SpellDto.toSpell(): Spell {

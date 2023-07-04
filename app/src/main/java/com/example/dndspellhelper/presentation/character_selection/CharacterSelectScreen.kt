@@ -1,6 +1,7 @@
 package com.example.dndspellhelper.presentation.character_selection
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -77,7 +78,10 @@ fun CharacterSelectScreen(navController: NavController, viewModel: CharactersVie
 
             LazyColumn(Modifier.fillMaxSize()) {
                 items(characters) { character ->
-                    CharacterItem(character)
+                    CharacterItem(character, Modifier.clickable {
+                        viewModel.setCharacter(character)
+                        navController.navigate("character_info")
+                    })
                 }
             }
         }
@@ -285,7 +289,7 @@ fun NewCharacterCreationDialog(
                                 val character = PlayerCharacter(
                                     name = name,
                                     characterClass = selectedClass,
-                                    level = level,
+                                    level = level.toInt(),
                                     attackModifier = attackModifier.toInt(),
                                     spellDC = spellSaveDiff.toInt()
                                 )

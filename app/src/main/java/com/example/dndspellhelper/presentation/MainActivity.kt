@@ -12,6 +12,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.dndspellhelper.presentation.bottom_navigation.BottomBar
 import com.example.dndspellhelper.presentation.bottom_navigation.BottomBarScreen
+import com.example.dndspellhelper.presentation.character_info.CharacterInfoScreen
 import com.example.dndspellhelper.presentation.character_selection.CharacterSelectScreen
 import com.example.dndspellhelper.presentation.character_selection.CharactersViewModel
 import com.example.dndspellhelper.presentation.spell_info.SpellInfoScreen
@@ -47,21 +48,24 @@ class MainActivity : ComponentActivity() {
                             modifier = Modifier.padding(padding)
                         ) {
                             composable("spell_list") {
-                                SpellList(navController, viewModel = spellsViewModel)
+                                SpellList(navController, spellsViewModel)
                             }
                             composable(BottomBarScreen.Characters.route) {
-                                CharacterSelectScreen(navController = navController, charactersViewModel)
+                                CharacterSelectScreen(
+                                    navController,
+                                    charactersViewModel
+                                )
                             }
                             composable("spell_info") {
-                                SpellInfoScreen(myViewModel = spellsViewModel)
+                                SpellInfoScreen(spellsViewModel)
+                            }
+                            composable("character_info") {
+                                CharacterInfoScreen(charactersViewModel)
                             }
                         }
-
                     }
                 )
-
             }
-
         }
     }
 }
