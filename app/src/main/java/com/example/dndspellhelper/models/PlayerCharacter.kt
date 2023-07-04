@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey
 import kotlinx.parcelize.Parcelize
 
 
-@Parcelize
+
 @Entity(
     tableName = "characters"
 )
@@ -17,7 +17,7 @@ data class PlayerCharacter(
     val knownSpells: List<Spell> = listOf(),
     val attackModifier: Int,
     val spellDC: Int,
-): Parcelable {
+) {
     constructor() :
         this(
             name = "Mir",

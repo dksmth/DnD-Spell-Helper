@@ -60,7 +60,12 @@ class MainActivity : ComponentActivity() {
                                 SpellInfoScreen(spellsViewModel)
                             }
                             composable("character_info") {
-                                CharacterInfoScreen(charactersViewModel)
+                                CharacterInfoScreen(
+                                    navController, charactersViewModel
+                                )
+                            }
+                            composable("pick_spells") {
+
                             }
                         }
                     }

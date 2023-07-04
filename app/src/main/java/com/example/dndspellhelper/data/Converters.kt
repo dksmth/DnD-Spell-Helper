@@ -1,6 +1,7 @@
 package com.example.dndspellhelper.data
 
 import androidx.room.TypeConverter
+import com.example.dndspellhelper.data.remote.dto.spell.ClassName
 import com.example.dndspellhelper.models.Spell
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -31,4 +32,18 @@ class Converters {
 
         return gson.fromJson(string, type)
     }
+
+    @TypeConverter
+    fun fromListOfClassesToString(list: List<ClassName>?): String {
+        return gson.toJson(list)
+    }
+
+    @TypeConverter
+    fun fromStringToListClasses(string: String): List<ClassName>? {
+        val type = object : TypeToken<List<ClassName>?>() {}.type
+
+        return gson.fromJson(string, type)
+    }
+
+
 }

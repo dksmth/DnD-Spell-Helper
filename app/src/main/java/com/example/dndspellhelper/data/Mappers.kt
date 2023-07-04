@@ -15,6 +15,7 @@ fun SpellDto.toSpell(): Spell {
         name = name,
         range = range,
         ritual = ritual,
-        material = material
+        material = material,
+        classNames = classes
     )
 }

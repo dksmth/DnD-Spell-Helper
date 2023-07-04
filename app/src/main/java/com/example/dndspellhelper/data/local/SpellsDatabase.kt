@@ -9,7 +9,7 @@ import com.example.dndspellhelper.models.PlayerCharacter
 
 @Database(
     entities = [Spell::class, PlayerCharacter::class],
-    version = 7,
+    version = 11,
     exportSchema = false
 )
 @TypeConverters(Converters::class)

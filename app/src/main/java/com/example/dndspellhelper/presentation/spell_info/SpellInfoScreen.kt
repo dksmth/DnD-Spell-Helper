@@ -96,7 +96,7 @@ fun SpellInfoScreen(
             MultipleRowsWithStuff(
                 mapOfTitlesAndValues = mapOf(
                     "Duration" to spell.duration,
-                    "Classes" to "TODO",
+                    "Classes" to (spell.classNames?.joinToString(separator = ", ") ?: ""),
                     "Subclasses" to "TODO"
                 ))
 

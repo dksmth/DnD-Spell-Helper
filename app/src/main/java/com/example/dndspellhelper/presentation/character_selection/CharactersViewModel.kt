@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.dndspellhelper.data.SpellsRepository
 import com.example.dndspellhelper.data.remote.dto.character_level.ClassLevel
 import com.example.dndspellhelper.models.PlayerCharacter
+import com.example.dndspellhelper.models.Spell
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -35,6 +36,16 @@ class CharactersViewModel @Inject constructor(private val spellsRepository: Spel
         viewModelScope.launch(Dispatchers.IO) {
             spellsRepository.insertCharacter(playerCharacter = playerCharacter)
             _allCharacters.emit(_allCharacters.value + playerCharacter)
+        }
+    }
+
+    fun addNewSpellToCharacterSpellList(spell: Spell) {
+        val newList = _character.value!!.knownSpells + spell
+
+        viewModelScope.launch {
+            spellsRepository.updateCharacterSpells(newList, _character.value!!.name)
+
+            _character.emit(_character.value!!.copy(knownSpells = newList))
         }
     }
 

@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Update
 import com.example.dndspellhelper.models.Spell
 import com.example.dndspellhelper.models.PlayerCharacter
 
@@ -30,4 +31,7 @@ interface SpellsDao {
 
     @Query("SELECT * FROM characters")
     suspend fun getAllCharacters(): List<PlayerCharacter>
+
+    @Query("UPDATE characters SET knownSpells =:newList WHERE name = :name")
+    suspend fun updateCharacterSpells(newList: List<Spell>, name: String)
 }
