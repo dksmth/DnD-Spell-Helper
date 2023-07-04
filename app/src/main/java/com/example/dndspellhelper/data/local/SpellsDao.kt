@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.example.dndspellhelper.models.Spell
+import com.example.dndspellhelper.models.PlayerCharacter
 
 @Dao
 interface SpellsDao {
@@ -22,5 +23,11 @@ interface SpellsDao {
     suspend fun updateFavouritesStatus(favourite: Boolean, name: String)
 
     @Query("SELECT EXISTS(SELECT * FROM spells)")
-    fun isExists(): Boolean
+    suspend fun isExists(): Boolean
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertCharacter(playerCharacter: PlayerCharacter)
+
+    @Query("SELECT * FROM characters")
+    suspend fun getAllCharacters(): List<PlayerCharacter>
 }

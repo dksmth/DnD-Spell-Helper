@@ -9,16 +9,15 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.Divider
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.dndspellhelper.models.Character
+import com.example.dndspellhelper.models.PlayerCharacter
 
 @Composable
-fun CharacterItem(character: MutableState<Character>) {
+fun CharacterItem(playerCharacter: PlayerCharacter) {
     Row(
         Modifier
             .fillMaxWidth()
@@ -28,7 +27,7 @@ fun CharacterItem(character: MutableState<Character>) {
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            text = character.value.name,
+            text = playerCharacter.name,
             fontSize = 20.sp,
         )
 
@@ -45,7 +44,7 @@ fun CharacterItem(character: MutableState<Character>) {
 
 
         Text(
-            text = character.value.characterClass,
+            text = playerCharacter.characterClass,
             modifier = Modifier
                 .weight(1f)
         )
@@ -57,7 +56,7 @@ fun CharacterItem(character: MutableState<Character>) {
         Spacer(Modifier.width(10.dp))
 
         Text(
-            text = character.value.level,
+            text = playerCharacter.level,
             fontSize = 30.sp
         )
     }

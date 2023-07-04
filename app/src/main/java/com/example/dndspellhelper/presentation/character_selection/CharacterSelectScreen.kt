@@ -10,8 +10,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.ButtonDefaults
@@ -20,32 +22,34 @@ import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ExposedDropdownMenuBox
 import androidx.compose.material.ExposedDropdownMenuDefaults
+import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
-import com.example.dndspellhelper.models.Character
+import com.example.dndspellhelper.models.PlayerCharacter
 import com.example.dndspellhelper.ui.theme.DnDSpellHelperTheme
 
 @Composable
-fun CharacterSelectScreen(navController: NavController) {
+fun CharacterSelectScreen(navController: NavController, viewModel: CharactersViewModel) {
 
     DnDSpellHelperTheme {
-        val characters = remember { mutableStateOf(Character()) }
+        val characters by viewModel.allCharacters.collectAsState()
 
         var showDialog by remember { mutableStateOf(false) }
 
@@ -67,13 +71,13 @@ fun CharacterSelectScreen(navController: NavController) {
             if (showDialog) {
                 NewCharacterCreationDialog(
                     onDismiss = { showDialog = false },
-                    onSave = {}
+                    viewModel
                 )
             }
 
             LazyColumn(Modifier.fillMaxSize()) {
-                item {
-                    CharacterItem(characters)
+                items(characters) { character ->
+                    CharacterItem(character)
                 }
             }
         }
@@ -83,13 +87,15 @@ fun CharacterSelectScreen(navController: NavController) {
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun NewCharacterCreationDialog(onDismiss: () -> Unit, onSave: () -> Unit) {
-
+fun NewCharacterCreationDialog(
+    onDismiss: () -> Unit,
+    viewModel: CharactersViewModel,
+) {
     var name by remember { mutableStateOf("") }
 
     val classes = arrayOf("Bard", "Wizard", "Sorcerer")
     var expanded by remember { mutableStateOf(false) }
-    var selectedText by remember { mutableStateOf("") }
+    var selectedClass by remember { mutableStateOf("") }
 
     var level by remember { mutableStateOf("") }
     var attackModifier by remember { mutableStateOf("") }
@@ -111,44 +117,66 @@ fun NewCharacterCreationDialog(onDismiss: () -> Unit, onSave: () -> Unit) {
                     modifier = Modifier.padding(bottom = 20.dp)
                 )
 
-                TextField(
-                    value = name,
-                    onValueChange = { name = it.replace("\n", "") },
-                    placeholder = { Text("Name") }
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Name",
+                        fontSize = 16.sp
+                    )
+
+                    Spacer(Modifier.width(10.dp))
+
+                    TextField(
+                        value = name,
+                        onValueChange = { name = it.replace("\n", "") },
+                        placeholder = { Text("Name") }
+                    )
+                }
 
                 Spacer(Modifier.height(10.dp))
 
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    ExposedDropdownMenuBox(
-                        expanded = expanded,
-                        onExpandedChange = {
-                            expanded = !expanded
-                        }
-                    ) {
-                        TextField(
-                            value = selectedText,
-                            placeholder = { Text("Select your class") },
-                            onValueChange = {},
-                            readOnly = true,
-                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                        )
+                    Text(
+                        text = "Class",
+                        fontSize = 16.sp
+                    )
 
-                        ExposedDropdownMenu(
+                    Spacer(Modifier.width(10.dp))
+
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                    ) {
+                        ExposedDropdownMenuBox(
                             expanded = expanded,
-                            onDismissRequest = { expanded = false }
+                            onExpandedChange = {
+                                expanded = !expanded
+                            }
                         ) {
-                            classes.forEach { item ->
-                                DropdownMenuItem(
-                                    content = { Text(text = item) },
-                                    onClick = {
-                                        selectedText = item
-                                        expanded = false
-                                    }
-                                )
+                            TextField(
+                                value = selectedClass,
+                                placeholder = { Text("Select your class") },
+                                onValueChange = {},
+                                readOnly = true,
+                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                            )
+
+                            ExposedDropdownMenu(
+                                expanded = expanded,
+                                onDismissRequest = { expanded = false }
+                            ) {
+                                classes.forEach { item ->
+                                    DropdownMenuItem(
+                                        content = { Text(text = item) },
+                                        onClick = {
+                                            selectedClass = item
+                                            expanded = false
+                                        }
+                                    )
+                                }
                             }
                         }
                     }
@@ -156,30 +184,74 @@ fun NewCharacterCreationDialog(onDismiss: () -> Unit, onSave: () -> Unit) {
 
                 Spacer(Modifier.height(10.dp))
 
-                TextField(
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
-                    value = level,
-                    onValueChange = { level = it },
-                    placeholder = { Text("Level of your character") }
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Character level",
+                        fontSize = 16.sp
+                    )
+
+                    Spacer(Modifier.weight(1f))
+
+                    TextField(
+                        value = level,
+                        onValueChange = { level = it.take(2) },
+
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
+                        textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
+
+                        modifier = Modifier.width(60.dp)
+                    )
+                }
 
                 Spacer(Modifier.height(10.dp))
 
-                TextField(
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
-                    value = attackModifier,
-                    onValueChange = { attackModifier = it },
-                    placeholder = { Text("Your spell attack modifier") }
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Spell attack modifier",
+                        fontSize = 16.sp
+                    )
+
+                    Spacer(Modifier.weight(1f))
+
+                    TextField(
+                        value = attackModifier,
+                        onValueChange = { attackModifier = it.take(2) },
+
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
+                        textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
+
+                        modifier = Modifier.width(60.dp)
+                    )
+                }
 
                 Spacer(Modifier.height(10.dp))
 
-                TextField(
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
-                    value = spellSaveDiff,
-                    onValueChange = { spellSaveDiff = it },
-                    placeholder = { Text("Your spell save DC") }
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+
+                    Text(
+                        text = "Spell save DC",
+                        fontSize = 16.sp
+                    )
+
+                    Spacer(Modifier.weight(1f))
+
+                    TextField(
+                        value = spellSaveDiff,
+                        onValueChange = { spellSaveDiff = it.take(2) },
+
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
+                        textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
+
+                        modifier = Modifier
+                            .width(60.dp)
+                    )
+                }
 
                 Spacer(Modifier.height(20.dp))
 
@@ -198,12 +270,36 @@ fun NewCharacterCreationDialog(onDismiss: () -> Unit, onSave: () -> Unit) {
 
                     Spacer(Modifier.weight(1f))
 
+                    val canSave = listOf(
+                        name,
+                        selectedClass,
+                        level,
+                        attackModifier,
+                        spellSaveDiff
+                    ).none { it == "" }
+
                     TextButton(
-                        onClick = { /*TODO*/ },
+                        onClick = {
+                            if (canSave) {
+
+                                val character = PlayerCharacter(
+                                    name = name,
+                                    characterClass = selectedClass,
+                                    level = level,
+                                    attackModifier = attackModifier.toInt(),
+                                    spellDC = spellSaveDiff.toInt()
+                                )
+
+                                viewModel.insertCharacter(character)
+                                onDismiss()
+                            }
+                        },
                     ) {
+                        val color = if (canSave) Color(0xFF2196F3) else Color.Gray
+
                         Text(
                             text = "Create Character",
-                            color = Color(0xFF2196F3),
+                            color = color,
                             fontSize = 18.sp
                         )
                     }
@@ -213,9 +309,3 @@ fun NewCharacterCreationDialog(onDismiss: () -> Unit, onSave: () -> Unit) {
     }
 }
 
-
-@Preview
-@Composable
-fun Preview() {
-    CharacterSelectScreen(navController = rememberNavController())
-}

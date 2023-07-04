@@ -13,6 +13,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.dndspellhelper.presentation.bottom_navigation.BottomBar
 import com.example.dndspellhelper.presentation.bottom_navigation.BottomBarScreen
 import com.example.dndspellhelper.presentation.character_selection.CharacterSelectScreen
+import com.example.dndspellhelper.presentation.character_selection.CharactersViewModel
 import com.example.dndspellhelper.presentation.spell_info.SpellInfoScreen
 import com.example.dndspellhelper.presentation.spell_list.ActivityViewModel
 import com.example.dndspellhelper.presentation.spell_list.SpellList
@@ -22,12 +23,14 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    private val viewModel: ActivityViewModel by viewModels()
+    private val spellsViewModel: ActivityViewModel by viewModels()
+    private val charactersViewModel: CharactersViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        viewModel.getEverything()
+        spellsViewModel.getEverything()
+        charactersViewModel.getAllCharacters()
 
         setContent {
             DnDSpellHelperTheme {
@@ -44,13 +47,13 @@ class MainActivity : ComponentActivity() {
                             modifier = Modifier.padding(padding)
                         ) {
                             composable("spell_list") {
-                                SpellList(navController, viewModel = viewModel)
+                                SpellList(navController, viewModel = spellsViewModel)
                             }
                             composable(BottomBarScreen.Characters.route) {
-                                CharacterSelectScreen(navController = navController)
+                                CharacterSelectScreen(navController = navController, charactersViewModel)
                             }
                             composable("spell_info") {
-                                SpellInfoScreen(myViewModel = viewModel)
+                                SpellInfoScreen(myViewModel = spellsViewModel)
                             }
                         }
 
