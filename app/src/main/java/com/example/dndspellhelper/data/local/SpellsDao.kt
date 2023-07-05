@@ -4,9 +4,8 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import androidx.room.Update
-import com.example.dndspellhelper.models.Spell
 import com.example.dndspellhelper.models.PlayerCharacter
+import com.example.dndspellhelper.models.Spell
 
 @Dao
 interface SpellsDao {
@@ -17,11 +16,14 @@ interface SpellsDao {
     @Query("SELECT * FROM spells")
     suspend fun getAllSpellsFromDB(): List<Spell>
 
-    @Query("SELECT * FROM spells WHERE favourite = :favourite")
-    suspend fun getFavouriteSpells(favourite: Boolean): List<Spell>
+//    @Query("SELECT * FROM spells WHERE favourite = :favourite")
+//    suspend fun getFavouriteSpells(favourite: Boolean): List<Spell>
 
     @Query("UPDATE spells SET favourite = :favourite WHERE name =:name")
     suspend fun updateFavouritesStatus(favourite: Boolean, name: String)
+
+    @Query("SELECT * FROM spells WHERE level = :level")
+    suspend fun getSpellsWithLevel(level: Int): List<Spell>
 
     @Query("SELECT EXISTS(SELECT * FROM spells)")
     suspend fun isExists(): Boolean

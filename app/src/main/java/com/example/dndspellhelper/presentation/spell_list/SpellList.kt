@@ -36,6 +36,7 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.dndspellhelper.R
 import me.saket.swipe.SwipeAction
@@ -44,7 +45,7 @@ import me.saket.swipe.SwipeableActionsBox
 @Composable
 fun SpellList(
     navController: NavController,
-    viewModel: ActivityViewModel,
+    viewModel: SpellListViewModel = hiltViewModel(),
 ) {
 
     val sortByLevel by viewModel.sortByLevel.collectAsState()
@@ -124,7 +125,7 @@ fun SpellList(
 
 @Composable
 private fun SortDropdownMenu(
-    viewModel: ActivityViewModel,
+    viewModel: SpellListViewModel,
 ) {
     var expanded by remember { mutableStateOf(false) }
 

@@ -21,24 +21,21 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.dndspellhelper.R
-import com.example.dndspellhelper.presentation.spell_list.ActivityViewModel
+import com.example.dndspellhelper.models.Spell
 import com.example.dndspellhelper.ui.theme.DnDSpellHelperTheme
 
 
 @Composable
 fun SpellInfoScreen(
-    myViewModel: ActivityViewModel
+    spell: Spell
 ) {
     DnDSpellHelperTheme {
-
-        val spell = myViewModel.chosenSpell
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(start = 7.dp, end = 10.dp, top = 20.dp, bottom = 10.dp)
+                .verticalScroll(rememberScrollState(0))
         ) {
-
             Row {
                 Text(
                     text = spell.name,
@@ -106,7 +103,6 @@ fun SpellInfoScreen(
                 text = spell.desc.joinToString(separator = "\n\n") { it.removeSurrounding("\"") },
                 modifier = Modifier
                     .padding(start = 2.dp, end = 10.dp)
-                    .verticalScroll(rememberScrollState(0))
             )
         }
     }

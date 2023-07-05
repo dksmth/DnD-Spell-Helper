@@ -6,17 +6,20 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Scaffold
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.dndspellhelper.presentation.bottom_navigation.BottomBar
 import com.example.dndspellhelper.presentation.bottom_navigation.BottomBarScreen
 import com.example.dndspellhelper.presentation.character_info.CharacterInfoScreen
+import com.example.dndspellhelper.presentation.character_info.PickSpells
 import com.example.dndspellhelper.presentation.character_selection.CharacterSelectScreen
 import com.example.dndspellhelper.presentation.character_selection.CharactersViewModel
 import com.example.dndspellhelper.presentation.spell_info.SpellInfoScreen
-import com.example.dndspellhelper.presentation.spell_list.ActivityViewModel
+import com.example.dndspellhelper.presentation.spell_list.SpellListViewModel
 import com.example.dndspellhelper.presentation.spell_list.SpellList
 import com.example.dndspellhelper.ui.theme.DnDSpellHelperTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -24,14 +27,11 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    private val spellsViewModel: ActivityViewModel by viewModels()
+    // private val spellsViewModel: ActivityViewModel by viewModels()
     private val charactersViewModel: CharactersViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        spellsViewModel.getEverything()
-        charactersViewModel.getAllCharacters()
 
         setContent {
             DnDSpellHelperTheme {
@@ -48,7 +48,7 @@ class MainActivity : ComponentActivity() {
                             modifier = Modifier.padding(padding)
                         ) {
                             composable("spell_list") {
-                                SpellList(navController, spellsViewModel)
+                                SpellList(navController)
                             }
                             composable(BottomBarScreen.Characters.route) {
                                 CharacterSelectScreen(
@@ -56,8 +56,15 @@ class MainActivity : ComponentActivity() {
                                     charactersViewModel
                                 )
                             }
-                            composable("spell_info") {
-                                SpellInfoScreen(spellsViewModel)
+                            composable("spell_info") { navBackStackEntry ->
+                                val parentEntry = remember(navBackStackEntry) {
+                                    navController.getBackStackEntry("spell_list")
+                                }
+
+                                val parentViewModel = hiltViewModel<SpellListViewModel>(
+                                    parentEntry
+                                )
+                                SpellInfoScreen(parentViewModel.chosenSpell)
                             }
                             composable("character_info") {
                                 CharacterInfoScreen(
@@ -65,7 +72,7 @@ class MainActivity : ComponentActivity() {
                                 )
                             }
                             composable("pick_spells") {
-
+                                PickSpells(navController, charactersViewModel)
                             }
                         }
                     }

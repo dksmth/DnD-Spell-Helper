@@ -9,12 +9,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
-import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -23,14 +22,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.dndspellhelper.R
-import com.example.dndspellhelper.models.PlayerCharacter
+import com.example.dndspellhelper.models.SpellFilter
 import com.example.dndspellhelper.presentation.character_selection.CharactersViewModel
-import com.example.dndspellhelper.ui.theme.DnDSpellHelperTheme
+import com.example.dndspellhelper.presentation.spell_list.ItemForList
 
 
 @Composable
@@ -43,8 +41,9 @@ fun CharacterInfoScreen(navController: NavController, viewModel: CharactersViewM
 
         Column(
             modifier = Modifier
-                .fillMaxSize()
                 .padding(16.dp)
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState(0))
         ) {
             Row(
                 modifier = Modifier
@@ -131,10 +130,6 @@ fun CharacterInfoScreen(navController: NavController, viewModel: CharactersViewM
 
                     }
 
-                    LazyColumn() {
-
-                    }
-
                     Button(onClick = { /*TODO*/ }, modifier = Modifier.fillMaxWidth()) {
                         Text("Add cantrip")
                     }
@@ -154,9 +149,6 @@ fun CharacterInfoScreen(navController: NavController, viewModel: CharactersViewM
                             )
                         }
 
-                        LazyColumn() {
-
-                        }
 
                         Button(
                             onClick = {
@@ -173,15 +165,23 @@ fun CharacterInfoScreen(navController: NavController, viewModel: CharactersViewM
                     Column() {
                         Row() {
                             Text("Cantrip")
-
                         }
 
-                        LazyColumn() {
+                        val list = character!!.knownSpells.filter { it.level == 3 }
 
+                        Column {
+                            list.forEach { spell ->
+                                ItemForList(spell = spell)
+                            }
                         }
 
-                        Button(onClick = { /*TODO*/ }, modifier = Modifier.fillMaxWidth()) {
-                            Text("Add cantrip")
+                        Button(onClick = {
+                            viewModel.getSpellsWithFilter(
+                                SpellFilter(3, character!!.characterClass)
+                            )
+                            navController.navigate("pick_spells")
+                        }, modifier = Modifier.fillMaxWidth()) {
+                            Text("Add 3 level spell")
                         }
                     }
                 }
@@ -190,11 +190,3 @@ fun CharacterInfoScreen(navController: NavController, viewModel: CharactersViewM
         }
     }
 }
-
-//@Preview
-//@Composable
-//fun Preview() {
-//    DnDSpellHelperTheme() {
-//        CharacterInfoScreen()
-//    }
-//}

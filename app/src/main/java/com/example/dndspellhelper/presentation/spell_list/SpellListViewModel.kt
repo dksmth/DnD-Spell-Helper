@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class ActivityViewModel @Inject constructor(private val spellsRepository: SpellsRepository) :
+class SpellListViewModel @Inject constructor(private val spellsRepository: SpellsRepository) :
     ViewModel() {
 
     private val _sortByLevel = MutableStateFlow(false)
@@ -49,7 +49,12 @@ class ActivityViewModel @Inject constructor(private val spellsRepository: Spells
 
     lateinit var chosenSpell: Spell
 
-    fun getEverything() {
+    init {
+        getEverything()
+    }
+
+
+    private fun getEverything() {
         viewModelScope.launch(Dispatchers.IO) {
             _spellNames.emit(spellsRepository.getSpellInfo())
         }

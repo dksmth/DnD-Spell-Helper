@@ -6,6 +6,7 @@ import com.example.dndspellhelper.data.SpellsRepository
 import com.example.dndspellhelper.data.remote.dto.character_level.ClassLevel
 import com.example.dndspellhelper.models.PlayerCharacter
 import com.example.dndspellhelper.models.Spell
+import com.example.dndspellhelper.models.SpellFilter
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,6 +27,13 @@ class CharactersViewModel @Inject constructor(private val spellsRepository: Spel
     private val _character = MutableStateFlow<PlayerCharacter?>(null)
     val character = _character.asStateFlow()
 
+    private val _filteredSpells = MutableStateFlow<List<Spell>?>(null)
+    val filteredSpells = _filteredSpells.asStateFlow()
+
+    init {
+        getAllCharacters()
+    }
+
     fun getAllCharacters() {
         viewModelScope.launch {
             _allCharacters.emit(spellsRepository.getAllCharacters())
@@ -36,6 +44,22 @@ class CharactersViewModel @Inject constructor(private val spellsRepository: Spel
         viewModelScope.launch(Dispatchers.IO) {
             spellsRepository.insertCharacter(playerCharacter = playerCharacter)
             _allCharacters.emit(_allCharacters.value + playerCharacter)
+        }
+    }
+
+    fun getSpellsWithFilter(spellFilter: SpellFilter) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val filteredWithLevel = spellsRepository.getSpellWithLevel(spellFilter.level!!)
+
+            val secondFilter = filteredWithLevel.filter { spell ->
+                spell.classNames?.any { playerClass ->
+                    playerClass.name == (spellFilter.characterClass ?: "")
+                } ?: true
+            }
+
+            val thirdFilter = secondFilter.filter { it !in character.value!!.knownSpells }
+
+            _filteredSpells.emit(thirdFilter)
         }
     }
 
