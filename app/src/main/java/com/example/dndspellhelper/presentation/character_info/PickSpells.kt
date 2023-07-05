@@ -35,12 +35,12 @@ fun PickSpells(
                         spell,
                         modifier = Modifier.clickable {
                             viewModel.addNewSpellToCharacterSpellList(spell)
-                            navController.navigate("character_info")
+                            navController.popBackStack(route = "character_info", inclusive = false)
                         }
                     )
 
                     Divider(
-                        color = Color.Black,
+                        color = Color.White,
                         thickness = 1.dp
                     )
                 }

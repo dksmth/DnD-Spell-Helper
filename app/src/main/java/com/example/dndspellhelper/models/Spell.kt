@@ -22,5 +22,5 @@ data class Spell(
     val range: String,
     val ritual: Boolean,
     val favourite: Boolean = false,
-    val classNames: List<ClassName>?
+    val classNames: List<ClassName>
 )

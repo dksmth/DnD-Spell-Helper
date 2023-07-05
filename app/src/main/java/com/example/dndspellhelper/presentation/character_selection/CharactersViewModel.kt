@@ -6,7 +6,6 @@ import com.example.dndspellhelper.data.SpellsRepository
 import com.example.dndspellhelper.data.remote.dto.character_level.ClassLevel
 import com.example.dndspellhelper.models.PlayerCharacter
 import com.example.dndspellhelper.models.Spell
-import com.example.dndspellhelper.models.SpellFilter
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -34,7 +33,7 @@ class CharactersViewModel @Inject constructor(private val spellsRepository: Spel
         getAllCharacters()
     }
 
-    fun getAllCharacters() {
+    private fun getAllCharacters() {
         viewModelScope.launch {
             _allCharacters.emit(spellsRepository.getAllCharacters())
         }
@@ -42,24 +41,25 @@ class CharactersViewModel @Inject constructor(private val spellsRepository: Spel
 
     fun insertCharacter(playerCharacter: PlayerCharacter) {
         viewModelScope.launch(Dispatchers.IO) {
-            spellsRepository.insertCharacter(playerCharacter = playerCharacter)
+            spellsRepository.insertCharacter(playerCharacter)
+
             _allCharacters.emit(_allCharacters.value + playerCharacter)
         }
     }
 
-    fun getSpellsWithFilter(spellFilter: SpellFilter) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val filteredWithLevel = spellsRepository.getSpellWithLevel(spellFilter.level!!)
+    fun getSpellsForLevelAndClass(level: Int) {
+        val characterClass = _character.value!!.characterClass
 
-            val secondFilter = filteredWithLevel.filter { spell ->
-                spell.classNames?.any { playerClass ->
-                    playerClass.name == (spellFilter.characterClass ?: "")
-                } ?: true
+        viewModelScope.launch(Dispatchers.IO) {
+            val filterForLevel = spellsRepository.getSpellWithLevel(level)
+
+            val filterForClass = filterForLevel.filter { spell ->
+                spell.classNames.any { playerClass -> playerClass.name == characterClass }
             }
 
-            val thirdFilter = secondFilter.filter { it !in character.value!!.knownSpells }
+            val filterForDuplicates = filterForClass.filter { it !in character.value!!.knownSpells }
 
-            _filteredSpells.emit(thirdFilter)
+            _filteredSpells.emit(filterForDuplicates)
         }
     }
 
@@ -70,6 +70,7 @@ class CharactersViewModel @Inject constructor(private val spellsRepository: Spel
             spellsRepository.updateCharacterSpells(newList, _character.value!!.name)
 
             _character.emit(_character.value!!.copy(knownSpells = newList))
+            getAllCharacters()
         }
     }
 
@@ -77,12 +78,12 @@ class CharactersViewModel @Inject constructor(private val spellsRepository: Spel
         viewModelScope.launch {
             _character.emit(character)
 
-            val smth = if (character.level > 20) 19 else character.level - 1
+            val characterLevel = if (character.level > 20) 19 else character.level - 1
 
             _characterClassAndLevelInfo.emit(
                 spellsRepository.getSpellcastingForClassAndLevel(
                     character.characterClass.lowercase(),
-                    smth
+                    characterLevel
                 )
             )
         }
