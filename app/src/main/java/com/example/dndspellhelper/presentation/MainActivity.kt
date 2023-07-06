@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Scaffold
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -51,28 +52,26 @@ class MainActivity : ComponentActivity() {
                                 SpellList(navController)
                             }
                             composable(BottomBarScreen.Characters.route) {
-                                CharacterSelectScreen(
-                                    navController,
-                                    charactersViewModel
-                                )
+                                CharacterSelectScreen(navController, charactersViewModel)
                             }
                             composable("spell_info") { navBackStackEntry ->
                                 val parentEntry = remember(navBackStackEntry) {
                                     navController.getBackStackEntry("spell_list")
                                 }
+                                val parentViewModel = hiltViewModel<SpellListViewModel>(parentEntry)
 
-                                val parentViewModel = hiltViewModel<SpellListViewModel>(
-                                    parentEntry
-                                )
                                 SpellInfoScreen(parentViewModel.chosenSpell)
                             }
                             composable("character_info") {
-                                CharacterInfoScreen(
-                                    navController, charactersViewModel
-                                )
+                                CharacterInfoScreen(navController, charactersViewModel)
                             }
                             composable("pick_spells") {
                                 PickSpells(navController, charactersViewModel)
+                            }
+                            composable("spell_info_from_character") {
+                                val spell = charactersViewModel.chosenSpell.collectAsState().value
+
+                                SpellInfoScreen(spell!!)
                             }
                         }
                     }

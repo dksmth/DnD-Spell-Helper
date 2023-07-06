@@ -1,6 +1,6 @@
 package com.example.dndspellhelper.presentation.character_info
 
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
@@ -11,6 +11,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.dndspellhelper.presentation.character_selection.CharactersViewModel
@@ -33,10 +34,22 @@ fun PickSpells(
 
                     ItemForList(
                         spell,
-                        modifier = Modifier.clickable {
-                            viewModel.addNewSpellToCharacterSpellList(spell)
-                            navController.popBackStack(route = "character_info", inclusive = false)
-                        }
+                        modifier = Modifier
+                            .pointerInput(Unit) {
+                                detectTapGestures(
+                                    onTap = {
+                                        viewModel.emitSpell(spell)
+                                        navController.navigate("spell_info_from_character")
+                                    },
+                                    onLongPress = {
+                                        viewModel.addNewSpellToCharacterSpellList(spell)
+                                        navController.popBackStack(
+                                            route = "character_info",
+                                            inclusive = false
+                                        )
+                                    }
+                                )
+                            }
                     )
 
                     Divider(

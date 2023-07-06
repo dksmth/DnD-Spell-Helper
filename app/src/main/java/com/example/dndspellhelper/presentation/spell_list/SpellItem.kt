@@ -10,7 +10,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,6 +31,8 @@ import com.example.dndspellhelper.models.Spell
 fun ItemForList(
     spell: Spell,
     modifier: Modifier = Modifier,
+    showLevel: Boolean = true,
+    action: (() -> Unit) = {},
 ) {
 
     val color = if (spell.favourite) Color(0xFFE49328) else Color.Black
@@ -79,10 +85,19 @@ fun ItemForList(
 
         Spacer(modifier = Modifier.width(10.dp))
 
-        Text(
-            text = "${spell.level}",
-            fontSize = 40.sp,
-        )
+        if (showLevel) {
+            Text(
+                text = "${spell.level}",
+                fontSize = 40.sp,
+            )
+        } else {
+            IconButton(
+                onClick = { action() },
+                modifier = Modifier.size(40.dp)
+            ) {
+                Icon(Icons.Default.Close, contentDescription = null)
+            }
+        }
 
         Spacer(modifier = Modifier.width(20.dp))
     }

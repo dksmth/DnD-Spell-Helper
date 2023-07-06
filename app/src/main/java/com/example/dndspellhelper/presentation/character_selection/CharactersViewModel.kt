@@ -29,6 +29,9 @@ class CharactersViewModel @Inject constructor(private val spellsRepository: Spel
     private val _filteredSpells = MutableStateFlow<List<Spell>?>(null)
     val filteredSpells = _filteredSpells.asStateFlow()
 
+    private val _chosenSpell = MutableStateFlow<Spell?>(null)
+    val chosenSpell = _chosenSpell.asStateFlow()
+
     init {
         getAllCharacters()
     }
@@ -36,6 +39,12 @@ class CharactersViewModel @Inject constructor(private val spellsRepository: Spel
     private fun getAllCharacters() {
         viewModelScope.launch {
             _allCharacters.emit(spellsRepository.getAllCharacters())
+        }
+    }
+
+    fun emitSpell(spell: Spell) {
+        viewModelScope.launch {
+            _chosenSpell.emit(spell)
         }
     }
 
@@ -86,6 +95,17 @@ class CharactersViewModel @Inject constructor(private val spellsRepository: Spel
                     characterLevel
                 )
             )
+        }
+    }
+
+    fun deleteSpellFromList(spell: Spell) {
+        val newList = _character.value!!.knownSpells - spell
+
+        viewModelScope.launch {
+            spellsRepository.updateCharacterSpells(newList, _character.value!!.name)
+
+            _character.emit(_character.value!!.copy(knownSpells = newList))
+            getAllCharacters()
         }
     }
 }

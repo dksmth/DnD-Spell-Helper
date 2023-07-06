@@ -1,5 +1,6 @@
 package com.example.dndspellhelper.presentation.character_info
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -74,7 +75,17 @@ fun CharacterInfoScreen(navController: NavController, viewModel: CharactersViewM
 
                 Column {
                     knownSpellsOfLevel.forEach { spell ->
-                        ItemForList(spell = spell)
+                        ItemForList(
+                            spell = spell,
+                            modifier = Modifier.clickable {
+                                viewModel.emitSpell(spell)
+                                navController.navigate("spell_info_from_character")
+                            },
+                            showLevel = false,
+                            action = {
+                                viewModel.deleteSpellFromList(spell)
+                            }
+                        )
 
                         Divider()
                     }
