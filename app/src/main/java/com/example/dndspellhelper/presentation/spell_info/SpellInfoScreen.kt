@@ -4,15 +4,14 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.runtime.Composable
 import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -27,12 +26,12 @@ import com.example.dndspellhelper.ui.theme.DnDSpellHelperTheme
 
 @Composable
 fun SpellInfoScreen(
-    spell: Spell
+    spell: Spell, modifier: Modifier = Modifier
 ) {
     DnDSpellHelperTheme {
         Column(
-            modifier = Modifier
-                .fillMaxSize()
+            modifier = modifier
+                //.fillMaxSize()
                 .padding(start = 7.dp, end = 10.dp, top = 20.dp, bottom = 10.dp)
                 .verticalScroll(rememberScrollState(0))
         ) {
@@ -93,7 +92,7 @@ fun SpellInfoScreen(
             MultipleRowsWithStuff(
                 mapOfTitlesAndValues = mapOf(
                     "Duration" to spell.duration,
-                    "Classes" to (spell.classNames?.joinToString(separator = ", ") ?: ""),
+                    "Classes" to (spell.classNames.joinToString(separator = ", ")),
                     "Subclasses" to "TODO"
                 ))
 

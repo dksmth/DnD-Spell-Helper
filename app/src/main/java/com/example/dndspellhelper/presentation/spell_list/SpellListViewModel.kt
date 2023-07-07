@@ -29,6 +29,15 @@ class SpellListViewModel @Inject constructor(private val spellsRepository: Spell
 
     private var _spellNames = MutableStateFlow(listOf<Spell>())
 
+    private val _classOfSpell = MutableStateFlow("")
+    val classOfSpell = _classOfSpell.asStateFlow()
+
+    private val _levelOfSpell = MutableStateFlow(IntRange(0,10))
+    val levelOfSpell = _levelOfSpell.asStateFlow()
+
+    private val _castingTime = MutableStateFlow("")
+    val castingTime = _castingTime.asStateFlow()
+
     val spellNames = _spellNames
 
         .combine(_showFavourites) { spells, showFav ->
@@ -39,6 +48,23 @@ class SpellListViewModel @Inject constructor(private val spellsRepository: Spell
         }
         .combine(_searchText) { spells, text ->
             spells.filter { it.name.lowercase().contains(text) }
+        }
+        .combine(_classOfSpell) { spells , className ->
+            if (className != "") spells.filter { spell ->
+                val classNames = spell.classNames.map { it.name }
+
+                classNames.contains(className)
+            } else spells
+        }
+        .combine(_levelOfSpell) { spells, levelRange ->
+            spells.filter { it.level in levelRange }
+        }
+        .combine(_castingTime) { spells, castTime ->
+            if (castTime != "") {
+                spells.filter { it.casting_time == castTime }
+            } else {
+                spells
+            }
         }
 
         .stateIn(
@@ -52,7 +78,6 @@ class SpellListViewModel @Inject constructor(private val spellsRepository: Spell
     init {
         getEverything()
     }
-
 
     private fun getEverything() {
         viewModelScope.launch(Dispatchers.IO) {
@@ -89,4 +114,15 @@ class SpellListViewModel @Inject constructor(private val spellsRepository: Spell
         _searchText.value = text.lowercase()
     }
 
+    fun onClassChange(playerClass: String) {
+        _classOfSpell.value = if (playerClass != "Any") playerClass else ""
+    }
+
+    fun onLevelChange(levelRange: IntRange) {
+        _levelOfSpell.value = levelRange
+    }
+
+    fun onCastTimeChange(castTime: String) {
+        _castingTime.value = if (castTime != "Any") castTime else ""
+    }
 }

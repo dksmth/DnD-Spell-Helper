@@ -84,6 +84,10 @@ fun SpellList(
             Spacer(Modifier.width(10.dp))
 
             SortDropdownMenu(viewModel)
+
+            IconButton(onClick = { navController.navigate("filter_spell") }) {
+                Icon(painter = painterResource(id =R.drawable.filter_icon), contentDescription = null)
+            }
         }
 
         LazyColumn {

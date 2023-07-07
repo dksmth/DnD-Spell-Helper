@@ -32,6 +32,8 @@ class CharactersViewModel @Inject constructor(private val spellsRepository: Spel
     private val _chosenSpell = MutableStateFlow<Spell?>(null)
     val chosenSpell = _chosenSpell.asStateFlow()
 
+    var showAddButton = false
+
     init {
         getAllCharacters()
     }

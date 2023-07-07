@@ -90,16 +90,21 @@ fun ItemForList(
                 text = "${spell.level}",
                 fontSize = 40.sp,
             )
+            Spacer(modifier = Modifier.width(20.dp))
         } else {
             IconButton(
                 onClick = { action() },
-                modifier = Modifier.size(40.dp)
             ) {
-                Icon(Icons.Default.Close, contentDescription = null)
+                Icon(
+                    Icons.Default.Close,
+                    contentDescription = null,
+                    modifier = Modifier.size(40.dp)
+                )
             }
+            Spacer(modifier = Modifier.width(10.dp))
         }
 
-        Spacer(modifier = Modifier.width(20.dp))
+
     }
 }
 

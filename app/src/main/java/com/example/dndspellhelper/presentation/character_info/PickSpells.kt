@@ -39,6 +39,7 @@ fun PickSpells(
                                 detectTapGestures(
                                     onTap = {
                                         viewModel.emitSpell(spell)
+                                        viewModel.showAddButton = true
                                         navController.navigate("spell_info_from_character")
                                     },
                                     onLongPress = {

@@ -79,6 +79,7 @@ fun CharacterInfoScreen(navController: NavController, viewModel: CharactersViewM
                             spell = spell,
                             modifier = Modifier.clickable {
                                 viewModel.emitSpell(spell)
+                                viewModel.showAddButton = false
                                 navController.navigate("spell_info_from_character")
                             },
                             showLevel = false,
