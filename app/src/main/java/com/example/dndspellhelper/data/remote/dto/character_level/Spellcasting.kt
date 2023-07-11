@@ -16,6 +16,8 @@ data class Spellcasting(
     val spells_known: Int?,
 ) {
 
+    constructor() : this(0, 0, 0,0, 0, 0, 0, 0, 0, 0, 0)
+
     fun getSpellcastingPairs(): List<SpellSlot> {
         val list = mutableListOf<SpellSlot>()
 

@@ -79,7 +79,7 @@ fun CharacterSelectScreen(navController: NavController, viewModel: CharactersVie
             LazyColumn(Modifier.fillMaxSize()) {
                 items(characters) { character ->
                     CharacterItem(character, Modifier.clickable {
-                        viewModel.setCharacter(character)
+                        viewModel.changeCharacter(character)
                         navController.navigate("character_info")
                     })
                 }

@@ -103,7 +103,7 @@ fun FilterSpellsScreen(navController: NavController, viewModel: SpellListViewMod
                                 if (it.isDigitsOnly() && it.toInt() < 20) {
                                     val start = if (it == "") 0 else it.toInt()
 
-                                    if (start < 10) viewModel.onLevelChange(IntRange(start, levelOfSpell.last))
+                                    if (start < 10) viewModel.onLevelChange(start..levelOfSpell.last)
                                 }
                             }
                         )

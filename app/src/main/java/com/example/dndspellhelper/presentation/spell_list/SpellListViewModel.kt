@@ -32,7 +32,7 @@ class SpellListViewModel @Inject constructor(private val spellsRepository: Spell
     private val _classOfSpell = MutableStateFlow("")
     val classOfSpell = _classOfSpell.asStateFlow()
 
-    private val _levelOfSpell = MutableStateFlow(IntRange(0,10))
+    private val _levelOfSpell = MutableStateFlow(IntRange(0, 10))
     val levelOfSpell = _levelOfSpell.asStateFlow()
 
     private val _castingTime = MutableStateFlow("")
@@ -49,7 +49,7 @@ class SpellListViewModel @Inject constructor(private val spellsRepository: Spell
         .combine(_searchText) { spells, text ->
             spells.filter { it.name.lowercase().contains(text) }
         }
-        .combine(_classOfSpell) { spells , className ->
+        .combine(_classOfSpell) { spells, className ->
             if (className != "") spells.filter { spell ->
                 val classNames = spell.classNames.map { it.name }
 
@@ -60,11 +60,7 @@ class SpellListViewModel @Inject constructor(private val spellsRepository: Spell
             spells.filter { it.level in levelRange }
         }
         .combine(_castingTime) { spells, castTime ->
-            if (castTime != "") {
-                spells.filter { it.casting_time == castTime }
-            } else {
-                spells
-            }
+            if (castTime == "") spells else spells.filter { it.casting_time == castTime }
         }
 
         .stateIn(

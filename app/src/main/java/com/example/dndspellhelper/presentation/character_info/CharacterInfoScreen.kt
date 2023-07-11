@@ -9,20 +9,28 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.Divider
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.dndspellhelper.R
 import com.example.dndspellhelper.models.PlayerCharacter
 import com.example.dndspellhelper.presentation.character_selection.CharactersViewModel
 import com.example.dndspellhelper.presentation.spell_list.ItemForList
@@ -32,9 +40,10 @@ import com.example.dndspellhelper.presentation.spell_list.ItemForList
 fun CharacterInfoScreen(navController: NavController, viewModel: CharactersViewModel) {
 
     val character by viewModel.character.collectAsState()
-    val characterSpellCasting by viewModel.characterInfo.collectAsState()
+    val currentSpellSlots = viewModel.characterInfo
+    val defaultSpellSlots = viewModel.spellSlots
 
-    if (character != null && characterSpellCasting != null) {
+    if (character != null) {
 
         Column(
             modifier = Modifier
@@ -50,28 +59,77 @@ fun CharacterInfoScreen(navController: NavController, viewModel: CharactersViewM
 
             Spacer(Modifier.height(30.dp))
 
-            val allSpellSlots = characterSpellCasting!!.spellcasting.getSpellcastingPairs()
+            Row(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Spacer(modifier = Modifier.weight(1f))
 
-            allSpellSlots.forEach { spellSlot ->
+                Icon(
+                    painter = painterResource(id = R.drawable.moon_icon),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(80.dp)
+                        .padding(end = 30.dp)
+                        .clickable {
+                            viewModel.refreshSpellSlots()
+                        }
+                )
+            }
+
+
+            for (i in defaultSpellSlots.indices) {
 
                 Row(
                     verticalAlignment = CenterVertically,
                     modifier = Modifier.padding(vertical = 10.dp)
                 ) {
                     Text(
-                        text = "Level ${spellSlot.slot_level}",
+                        text = "Level ${defaultSpellSlots[i].slot_level}",
                         fontSize = 25.sp,
                         modifier = Modifier.weight(1f)
                     )
 
+                    if (currentSpellSlots[i].amountAtLevel != 0) {
+
+                        IconButton(
+                            onClick = { viewModel.minusSpellSlotAtLevel(defaultSpellSlots[i].slot_level - 1) },
+                            modifier = Modifier.size(30.dp)
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.minus),
+                                contentDescription = null
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.width(10.dp))
+
                     Text(
-                        text = "${spellSlot.amountAtLevel}",
+                        text = "${currentSpellSlots[i].amountAtLevel}",
                         fontSize = 30.sp
                     )
+
+                    Spacer(modifier = Modifier.width(5.dp))
+
+                    if (currentSpellSlots[i].amountAtLevel != defaultSpellSlots[i].amountAtLevel) {
+
+                        IconButton(
+
+                            onClick = { viewModel.plusSpellSlotAtLevel(defaultSpellSlots[i].slot_level - 1) },
+                            modifier = Modifier.size(30.dp)
+                        ) {
+                            Icon(
+                                Icons.Default.Add,
+                                contentDescription = null
+                            )
+                        }
+                    } else {
+                        Spacer(modifier = Modifier.width(30.dp))
+                    }
                 }
 
                 val knownSpellsOfLevel =
-                    character!!.knownSpells.filter { it.level == spellSlot.slot_level }
+                    character!!.knownSpells.filter { it.level == defaultSpellSlots[i].slot_level }
 
                 Column {
                     knownSpellsOfLevel.forEach { spell ->
@@ -94,19 +152,20 @@ fun CharacterInfoScreen(navController: NavController, viewModel: CharactersViewM
 
                 Button(
                     onClick = {
-                        viewModel.getSpellsForLevelAndClass(spellSlot.slot_level)
+                        viewModel.getSpellsForLevelAndClass(defaultSpellSlots[i].slot_level)
                         navController.navigate("pick_spells")
                     },
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
-                        text = "Add level ${spellSlot.slot_level} spell"
+                        text = "Add level ${defaultSpellSlots[i].slot_level} spell"
                     )
                 }
             }
         }
     }
 }
+
 
 @Composable
 private fun NameClassAndLevel(character: PlayerCharacter?) {

@@ -52,5 +52,7 @@ class SpellsRepository @Inject constructor(
 
     suspend fun updateCharacterSpells(newList: List<Spell>, id: String) = dao.updateCharacterSpells(newList,id)
 
+    // suspend fun updateCharacterSpellcasting(newList: List<SpellSlot>)
+
     suspend fun getSpellWithLevel(level: Int) = dao.getSpellsWithLevel(level)
 }

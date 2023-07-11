@@ -1,10 +1,8 @@
 package com.example.dndspellhelper.models
 
-import android.os.Parcelable
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import kotlinx.parcelize.Parcelize
-
+import com.example.dndspellhelper.data.remote.dto.character_level.Spellcasting
 
 
 @Entity(
@@ -17,6 +15,7 @@ data class PlayerCharacter(
     val knownSpells: List<Spell> = listOf(),
     val attackModifier: Int,
     val spellDC: Int,
+    val spellCasting: Spellcasting = Spellcasting(0,0,0,0,0,0,0,0,0,0,0)
 ) {
     constructor() :
         this(
