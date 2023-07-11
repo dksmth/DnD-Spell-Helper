@@ -37,8 +37,6 @@ class SpellsRepository @Inject constructor(
     suspend fun updateFavouritesStatus(name: String, favourite: Boolean) =
         dao.updateFavouritesStatus(favourite, name)
 
-    // suspend fun getAllFavourites() = dao.getFavouriteSpells(true)
-
     suspend fun insertCharacter(playerCharacter: PlayerCharacter) =
         dao.insertCharacter(playerCharacter)
 
@@ -47,8 +45,10 @@ class SpellsRepository @Inject constructor(
     private suspend fun getFullSpellcasting(className: String): ArrayList<ClassLevel> =
         api.getSpellcastingForClass(className)
 
-    suspend fun getSpellcastingForClassAndLevel(className: String, level: Int): ClassLevel =
-        getFullSpellcasting(className)[level]
+    suspend fun getSpellcastingForClassAndLevel(className: String, level: Int): ClassLevel  {
+        val validatedLevel = if (level > 20) 19 else level - 1
+        return getFullSpellcasting(className)[validatedLevel]
+    }
 
     suspend fun updateCharacterSpells(newList: List<Spell>, id: String) = dao.updateCharacterSpells(newList,id)
 

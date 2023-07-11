@@ -294,7 +294,7 @@ fun NewCharacterCreationDialog(
                                     spellDC = spellSaveDiff.toInt()
                                 )
 
-                                viewModel.insertCharacter(character)
+                                viewModel.createNewCharacter(character)
                                 onDismiss()
                             }
                         },

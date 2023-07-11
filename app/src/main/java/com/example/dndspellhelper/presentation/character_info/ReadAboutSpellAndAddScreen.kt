@@ -23,7 +23,7 @@ fun AddSpell(navController: NavController, viewModel: CharactersViewModel) {
         if (viewModel.showAddButton) {
             Button(
                 onClick = {
-                    viewModel.addNewSpellToCharacterSpellList(spell)
+                    viewModel.addSpellToSpellList(spell)
                     navController.popBackStack(
                         route = "character_info",
                         inclusive = false

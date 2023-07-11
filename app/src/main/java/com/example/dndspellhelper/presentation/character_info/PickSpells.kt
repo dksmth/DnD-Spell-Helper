@@ -43,7 +43,7 @@ fun PickSpells(
                                         navController.navigate("spell_info_from_character")
                                     },
                                     onLongPress = {
-                                        viewModel.addNewSpellToCharacterSpellList(spell)
+                                        viewModel.addSpellToSpellList(spell)
                                         navController.popBackStack(
                                             route = "character_info",
                                             inclusive = false

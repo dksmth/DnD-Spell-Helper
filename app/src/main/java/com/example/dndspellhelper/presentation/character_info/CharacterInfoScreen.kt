@@ -71,7 +71,7 @@ fun CharacterInfoScreen(navController: NavController, viewModel: CharactersViewM
                         .size(80.dp)
                         .padding(end = 30.dp)
                         .clickable {
-                            viewModel.refreshSpellSlots()
+                            viewModel.refreshCharacterSpellSlots()
                         }
                 )
             }
@@ -142,7 +142,7 @@ fun CharacterInfoScreen(navController: NavController, viewModel: CharactersViewM
                             },
                             showLevel = false,
                             action = {
-                                viewModel.deleteSpellFromList(spell)
+                                viewModel.deleteSpellFromSpellList(spell)
                             }
                         )
 
@@ -152,7 +152,7 @@ fun CharacterInfoScreen(navController: NavController, viewModel: CharactersViewM
 
                 Button(
                     onClick = {
-                        viewModel.getSpellsForLevelAndClass(defaultSpellSlots[i].slot_level)
+                        viewModel.filterClassSpellsForLevel(defaultSpellSlots[i].slot_level)
                         navController.navigate("pick_spells")
                     },
                     modifier = Modifier.fillMaxWidth()
