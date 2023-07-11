@@ -6,6 +6,7 @@ import com.example.dndspellhelper.data.remote.dto.character_level.ClassLevel
 import com.example.dndspellhelper.data.remote.dto.spell.SpellDto
 import com.example.dndspellhelper.models.PlayerCharacter
 import com.example.dndspellhelper.models.Spell
+import com.example.dndspellhelper.models.SpellSlot
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -45,14 +46,16 @@ class SpellsRepository @Inject constructor(
     private suspend fun getFullSpellcasting(className: String): ArrayList<ClassLevel> =
         api.getSpellcastingForClass(className)
 
-    suspend fun getSpellcastingForClassAndLevel(className: String, level: Int): ClassLevel  {
+    suspend fun getSpellcastingForClassAndLevel(className: String, level: Int): ClassLevel {
         val validatedLevel = if (level > 20) 19 else level - 1
         return getFullSpellcasting(className)[validatedLevel]
     }
 
-    suspend fun updateCharacterSpells(newList: List<Spell>, id: String) = dao.updateCharacterSpells(newList,id)
+    suspend fun updateCharacterSpells(newList: List<Spell>, id: String) =
+        dao.updateCharacterSpells(newList, id)
 
-    // suspend fun updateCharacterSpellcasting(newList: List<SpellSlot>)
+    suspend fun updateCharacterSpellcasting(newSpellSlots: List<SpellSlot>, name: String) =
+        dao.updateCharacterSpellSlots(newSpellSlots, name)
 
     suspend fun getSpellWithLevel(level: Int) = dao.getSpellsWithLevel(level)
 }

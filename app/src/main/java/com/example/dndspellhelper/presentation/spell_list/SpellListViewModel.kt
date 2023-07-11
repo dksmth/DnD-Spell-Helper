@@ -38,6 +38,9 @@ class SpellListViewModel @Inject constructor(private val spellsRepository: Spell
     private val _castingTime = MutableStateFlow("")
     val castingTime = _castingTime.asStateFlow()
 
+    private val _isRitual = MutableStateFlow(false)
+    val isRitual = _isRitual.asStateFlow()
+
     val spellNames = _spellNames
 
         .combine(_showFavourites) { spells, showFav ->
@@ -61,6 +64,9 @@ class SpellListViewModel @Inject constructor(private val spellsRepository: Spell
         }
         .combine(_castingTime) { spells, castTime ->
             if (castTime == "") spells else spells.filter { it.casting_time == castTime }
+        }
+        .combine(_isRitual) { spells, ritual ->
+            if (ritual) spells.filter { it.ritual } else spells
         }
 
         .stateIn(
@@ -120,5 +126,9 @@ class SpellListViewModel @Inject constructor(private val spellsRepository: Spell
 
     fun onCastTimeChange(castTime: String) {
         _castingTime.value = if (castTime != "Any") castTime else ""
+    }
+
+    fun onRitualChange(isTrue: Boolean) {
+        _isRitual.value = isTrue
     }
 }

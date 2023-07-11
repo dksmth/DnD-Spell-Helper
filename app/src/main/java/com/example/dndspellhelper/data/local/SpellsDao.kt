@@ -6,6 +6,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.example.dndspellhelper.models.PlayerCharacter
 import com.example.dndspellhelper.models.Spell
+import com.example.dndspellhelper.models.SpellSlot
 
 @Dao
 interface SpellsDao {
@@ -36,4 +37,7 @@ interface SpellsDao {
 
     @Query("UPDATE characters SET knownSpells =:newList WHERE name = :name")
     suspend fun updateCharacterSpells(newList: List<Spell>, name: String)
+
+    @Query("UPDATE characters SET spellCasting =:newSpellSlots WHERE name =:name")
+    suspend fun updateCharacterSpellSlots(newSpellSlots: List<SpellSlot>, name: String)
 }

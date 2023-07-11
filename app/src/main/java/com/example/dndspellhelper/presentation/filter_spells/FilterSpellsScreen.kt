@@ -19,6 +19,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.Scaffold
+import androidx.compose.material.Switch
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
@@ -65,6 +66,8 @@ fun FilterSpellsScreen(navController: NavController, viewModel: SpellListViewMod
             )
         var isCastTimeMenuExpanded by remember { mutableStateOf(false) }
         val selectedCastTime by viewModel.castingTime.collectAsState()
+
+        val ritual by viewModel.isRitual.collectAsState()
 
         Scaffold(topBar = {
             TopAppBar(Modifier.fillMaxWidth()) {
@@ -120,7 +123,12 @@ fun FilterSpellsScreen(navController: NavController, viewModel: SpellListViewMod
                                 if (it.isDigitsOnly()) {
                                     val end = if (it == "") 0 else it.toInt()
 
-                                    if (end < 10) viewModel.onLevelChange(IntRange(levelOfSpell.first, end))
+                                    if (end < 10) viewModel.onLevelChange(
+                                        IntRange(
+                                            levelOfSpell.first,
+                                            end
+                                        )
+                                    )
                                 }
                             }
                         )
@@ -159,6 +167,17 @@ fun FilterSpellsScreen(navController: NavController, viewModel: SpellListViewMod
                         },
                         dropdownMenuItems = castingTime
                     )
+
+                    Spacer(Modifier.height(20.dp))
+
+                    Row(modifier = Modifier.fillMaxWidth()) {
+                        Text("Ritual", modifier = Modifier.weight(1f))
+
+                        Switch(
+                            checked = ritual,
+                            onCheckedChange = { viewModel.onRitualChange(it) }
+                        )
+                    }
                 }
             }
         )

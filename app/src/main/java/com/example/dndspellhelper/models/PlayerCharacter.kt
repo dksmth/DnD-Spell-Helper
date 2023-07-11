@@ -2,7 +2,6 @@ package com.example.dndspellhelper.models
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.example.dndspellhelper.data.remote.dto.character_level.Spellcasting
 
 
 @Entity(
@@ -15,7 +14,7 @@ data class PlayerCharacter(
     val knownSpells: List<Spell> = listOf(),
     val attackModifier: Int,
     val spellDC: Int,
-    val spellCasting: Spellcasting = Spellcasting(0,0,0,0,0,0,0,0,0,0,0)
+    val spellCasting: List<SpellSlot> = listOf()
 ) {
     constructor() :
         this(
