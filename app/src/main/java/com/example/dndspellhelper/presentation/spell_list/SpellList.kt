@@ -119,7 +119,7 @@ fun SpellList(
                 }
 
                 Divider(
-                    color = Color.Black,
+                    color = Color.White,
                     thickness = 1.dp
                 )
             }

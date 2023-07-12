@@ -1,13 +1,11 @@
 package com.example.dndspellhelper.presentation.character_selection
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -16,14 +14,19 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Card
+import androidx.compose.material.Divider
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.FabPosition
+import androidx.compose.material.FloatingActionButton
+import androidx.compose.material.Icon
 import androidx.compose.material.LocalTextStyle
-import androidx.compose.material.OutlinedButton
+import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.material.TextField
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -50,20 +53,18 @@ fun CharacterSelectScreen(navController: NavController, viewModel: CharactersVie
 
         var showDialog by remember { mutableStateOf(false) }
 
-        Column(Modifier.padding(top = 10.dp)) {
-
-            OutlinedButton(
-                onClick = { showDialog = true },
-                colors = ButtonDefaults.buttonColors(backgroundColor = Color.Transparent),
-                border = BorderStroke(1.dp, Color(0xFF2196F3)),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(
-                    text = "Create new Character",
-                    fontSize = 20.sp,
-                    color = Color(0xFF2196F3)
-                )
-            }
+        Scaffold(
+            floatingActionButton = {
+                FloatingActionButton(
+                    onClick = { showDialog = true },
+                    backgroundColor = Color(0xFF2196F3),
+                    contentColor = Color.White
+                ) {
+                    Icon(Icons.Filled.Add, contentDescription = "Add character")
+                }
+            },
+            floatingActionButtonPosition = FabPosition.End
+        ) {
 
             if (showDialog) {
                 NewCharacterCreationDialog(
@@ -72,12 +73,49 @@ fun CharacterSelectScreen(navController: NavController, viewModel: CharactersVie
                 )
             }
 
-            LazyColumn(Modifier.fillMaxSize()) {
-                items(characters) { character ->
-                    CharacterItem(character, Modifier.clickable {
-                        viewModel.setCharacter(character)
-                        navController.navigate("character_info")
-                    })
+            Column(
+                Modifier
+                    .padding(it)
+                    .padding(top = 10.dp)
+            ) {
+
+//            OutlinedButton(
+//                onClick = { showDialog = true },
+//                colors = ButtonDefaults.buttonColors(backgroundColor = Color.Transparent),
+//                border = BorderStroke(1.dp, Color(0xFF2196F3)),
+//                modifier = Modifier.fillMaxWidth()
+//            ) {
+//                Text(
+//                    text = "Create new Character",
+//                    fontSize = 20.sp,
+//                    color = Color(0xFF2196F3)
+//                )
+//            }
+
+//                FloatingActionButton(
+//                    onClick = { showDialog = true },
+//                    backgroundColor = Color(0xFF2196F3),
+//                    contentColor = Color.White
+//                ) {
+//                    Icon(Icons.Filled.Add, contentDescription = "Add character")
+//                }
+//
+//                if (showDialog) {
+//                    NewCharacterCreationDialog(
+//                        onDismiss = { showDialog = false },
+//                        viewModel
+//                    )
+//                }
+
+                LazyColumn(Modifier.fillMaxSize()) {
+                    items(characters) { character ->
+                        CharacterItem(character, Modifier.clickable {
+                            viewModel.setCharacter(character)
+                            navController.navigate("character_info")
+                        })
+
+                        Divider()
+                    }
                 }
             }
         }

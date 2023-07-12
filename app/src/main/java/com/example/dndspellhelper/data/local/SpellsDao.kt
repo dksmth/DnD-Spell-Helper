@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import com.example.dndspellhelper.models.ClassLevel
 import com.example.dndspellhelper.models.PlayerCharacter
 import com.example.dndspellhelper.models.Spell
 import com.example.dndspellhelper.models.SpellSlot
@@ -40,4 +41,13 @@ interface SpellsDao {
 
     @Query("UPDATE characters SET spellCasting =:newSpellSlots WHERE name =:name")
     suspend fun updateCharacterSpellSlots(newSpellSlots: List<SpellSlot>, name: String)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertClassLevel(classLevel: ClassLevel)
+
+    @Query("SELECT EXISTS(SELECT * FROM class_level WHERE className = :name AND level =:level)")
+    fun classLevelInDB(name : String, level: Int) : Boolean
+
+    @Query("SELECT * FROM class_level WHERE className = :name AND level =:level")
+    fun getClassLevel(name : String, level: Int): ClassLevel
 }

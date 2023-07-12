@@ -61,7 +61,7 @@ class CharactersViewModel @Inject constructor(private val spellsRepository: Spel
         )
 
         viewModelScope.launch(Dispatchers.IO) {
-            val spellSlots = spellsRepository.getSpellSlotsForCharacter(newCharacter)
+            val spellSlots = spellsRepository.getSpellSlots(newCharacter)
             val newCharacterWithSpellcasting = newCharacter.copy(spellCasting = spellSlots)
 
             spellsRepository.insertCharacter(newCharacterWithSpellcasting)
@@ -70,8 +70,8 @@ class CharactersViewModel @Inject constructor(private val spellsRepository: Spel
     }
 
     fun setCharacter(character: PlayerCharacter) {
-        viewModelScope.launch {
-            defaultSpellSlots = spellsRepository.getSpellSlotsForCharacter(character)
+        viewModelScope.launch(Dispatchers.IO) {
+            defaultSpellSlots = spellsRepository.getSpellSlots(character)
 
             _character.emit(character)
         }
@@ -115,7 +115,10 @@ class CharactersViewModel @Inject constructor(private val spellsRepository: Spel
         newSpellSlotsList?.set(level, newSpellSlotsList[level].copy(amountAtLevel = newValue))
 
         viewModelScope.launch {
-            spellsRepository.updateCharacterSpellcasting(newSpellSlotsList!!.toList(), character.value!!.name)
+            spellsRepository.updateCharacterSpellcasting(
+                newSpellSlotsList!!.toList(),
+                character.value!!.name
+            )
 
             _character.emit(_character.value!!.copy(spellCasting = newSpellSlotsList))
             getAllCharacters()

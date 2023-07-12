@@ -1,6 +1,7 @@
 package com.example.dndspellhelper.data
 
 import androidx.room.TypeConverter
+import com.example.dndspellhelper.data.remote.dto.character_level.Spellcasting
 import com.example.dndspellhelper.data.remote.dto.spell.ClassName
 import com.example.dndspellhelper.models.Spell
 import com.example.dndspellhelper.models.SpellSlot
@@ -42,6 +43,18 @@ class Converters {
     @TypeConverter
     fun fromStringToListClasses(string: String): List<ClassName>? {
         val type = object : TypeToken<List<ClassName>?>() {}.type
+
+        return gson.fromJson(string, type)
+    }
+
+    @TypeConverter
+    fun fromSpellcastingToString(spellcasting: Spellcasting): String {
+        return gson.toJson(spellcasting)
+    }
+
+    @TypeConverter
+    fun fromStringToSpellcasting(string: String): Spellcasting {
+        val type = object : TypeToken<Spellcasting>() {}.type
 
         return gson.fromJson(string, type)
     }

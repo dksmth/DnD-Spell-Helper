@@ -103,11 +103,7 @@ fun FilterSpellsScreen(navController: NavController, viewModel: SpellListViewMod
                         LevelFilterTextField(
                             value = levelOfSpell.first,
                             onInputChanged = {
-                                if (it.isDigitsOnly() && it.toInt() < 20) {
-                                    val start = if (it == "") 0 else it.toInt()
-
-                                    if (start < 10) viewModel.onLevelChange(start..levelOfSpell.last)
-                                }
+                                viewModel.onLevelChange(it..levelOfSpell.last)
                             }
                         )
 
@@ -120,16 +116,7 @@ fun FilterSpellsScreen(navController: NavController, viewModel: SpellListViewMod
                         LevelFilterTextField(
                             value = levelOfSpell.last,
                             onInputChanged = {
-                                if (it.isDigitsOnly()) {
-                                    val end = if (it == "") 0 else it.toInt()
-
-                                    if (end < 10) viewModel.onLevelChange(
-                                        IntRange(
-                                            levelOfSpell.first,
-                                            end
-                                        )
-                                    )
-                                }
+                                viewModel.onLevelChange(levelOfSpell.first..it)
                             }
                         )
 
@@ -239,7 +226,7 @@ fun RowWithDropDownMenu(
 }
 
 @Composable
-fun LevelFilterTextField(value: Int, onInputChanged: (String) -> Unit) {
+fun LevelFilterTextField(value: Int, onInputChanged: (Int) -> Unit) {
 
     val string = if (value != 0) value.toString() else ""
 
@@ -249,7 +236,15 @@ fun LevelFilterTextField(value: Int, onInputChanged: (String) -> Unit) {
             .height(50.dp),
 
         value = string,
-        onValueChange = onInputChanged,
+        onValueChange = {
+            if (it.isDigitsOnly()) {
+                val intValue = if (it == "") 0 else it.toInt()
+
+                if (intValue < 10) {
+                    onInputChanged(intValue)
+                }
+            }
+        },
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
         textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
 

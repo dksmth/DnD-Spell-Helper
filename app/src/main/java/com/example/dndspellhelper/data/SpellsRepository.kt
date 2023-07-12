@@ -2,8 +2,7 @@ package com.example.dndspellhelper.data
 
 import com.example.dndspellhelper.data.local.SpellsDatabase
 import com.example.dndspellhelper.data.remote.SpellsApi
-import com.example.dndspellhelper.data.remote.dto.character_level.ClassLevel
-import com.example.dndspellhelper.data.remote.dto.character_level.Spellcasting
+import com.example.dndspellhelper.data.remote.dto.character_level.ClassLevelDto
 import com.example.dndspellhelper.data.remote.dto.spell.SpellDto
 import com.example.dndspellhelper.models.PlayerCharacter
 import com.example.dndspellhelper.models.Spell
@@ -17,6 +16,8 @@ class SpellsRepository @Inject constructor(
     private val api: SpellsApi,
 ) {
     private val dao = db.dao
+
+    // Spells
 
     private suspend fun getSpellInfoFromApi(): List<SpellDto> {
         val spellsIndexes = api.getAllSpells().results.map { it.index }
@@ -36,36 +37,19 @@ class SpellsRepository @Inject constructor(
         }
     }
 
+    // Favourite spells
+
     suspend fun updateFavouritesStatus(name: String, favourite: Boolean) =
         dao.updateFavouritesStatus(favourite, name)
+
+    // Character
 
     suspend fun insertCharacter(playerCharacter: PlayerCharacter) =
         dao.insertCharacter(playerCharacter)
 
     suspend fun getAllCharacters(): List<PlayerCharacter> = dao.getAllCharacters()
 
-    private suspend fun getFullSpellcasting(className: String): ArrayList<ClassLevel> =
-        api.getSpellcastingForClass(className)
-
-    suspend fun getClassLevelInfo(className: String, level: Int): ClassLevel {
-        val validatedLevel = if (level > 20) 19 else level - 1
-        return getFullSpellcasting(className)[validatedLevel]
-    }
-
-    suspend fun getClassLevelInfo(playerCharacter: PlayerCharacter): ClassLevel {
-        val validatedLevel = if (playerCharacter.level > 20) 19 else playerCharacter.level - 1
-        return getFullSpellcasting(playerCharacter.characterClass.lowercase())[validatedLevel]
-    }
-
-    suspend fun getSpellcastingForCharacter(character: PlayerCharacter): Spellcasting {
-        val classLevel = getClassLevelInfo(character)
-        return classLevel.spellcasting
-    }
-
-    suspend fun getSpellSlotsForCharacter(character: PlayerCharacter): List<SpellSlot> {
-        val spellcasting = getSpellcastingForCharacter(character)
-        return spellcasting.getSpellcastingPairs()
-    }
+    // Character Spells
 
     suspend fun updateCharacterSpells(newList: List<Spell>, id: String) =
         dao.updateCharacterSpells(newList, id)
@@ -74,4 +58,40 @@ class SpellsRepository @Inject constructor(
         dao.updateCharacterSpellSlots(newSpellSlots, name)
 
     suspend fun getSpellWithLevel(level: Int) = dao.getSpellsWithLevel(level)
+
+
+    // Class level
+
+    private suspend fun getFullClassInfoFromApi(className: String): ArrayList<ClassLevelDto> =
+        api.getClassInfo(className.lowercase())
+
+    private suspend fun getInfoForClassAndLevelFromAPI(
+        className: String,
+        level: Int,
+    ): ClassLevelDto {
+        val validatedLevel = if (level > 20) 19 else level - 1
+        return getFullClassInfoFromApi(className)[validatedLevel]
+    }
+
+    // Spellcasting and spell slots
+
+    suspend fun getSpellSlots(playerCharacter: PlayerCharacter): List<SpellSlot> {
+        return getSpellSlots(playerCharacter.characterClass, playerCharacter.level)
+    }
+
+    private suspend fun getSpellSlots(className: String, level: Int): List<SpellSlot> {
+        return if (dao.classLevelInDB(className, level)) {
+            getSpellSlotsFromDatabase(className,level)
+        } else {
+            val fromAPI = getInfoForClassAndLevelFromAPI(className, level)
+
+            dao.insertClassLevel(fromAPI.toClassLevel())
+
+            fromAPI.toClassLevel().spellcasting.getSpellcastingPairs()
+        }
+    }
+
+    private fun getSpellSlotsFromDatabase(className: String, level: Int): List<SpellSlot> =
+        dao.getClassLevel(className, level).spellcasting.getSpellcastingPairs()
+
 }

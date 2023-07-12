@@ -1,6 +1,6 @@
 package com.example.dndspellhelper.data.remote.dto.character_level
 
-data class ClassLevel(
+data class ClassLevelDto(
     val ability_score_bonuses: Int,
     val `class`: Class,
     val class_specific: ClassSpecific,

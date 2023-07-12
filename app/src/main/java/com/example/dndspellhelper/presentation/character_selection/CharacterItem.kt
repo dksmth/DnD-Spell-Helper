@@ -22,13 +22,13 @@ fun CharacterItem(playerCharacter: PlayerCharacter, modifier: Modifier = Modifie
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 10.dp)
-            .height(60.dp),
+            .height(75.dp),
 
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
             text = playerCharacter.name,
-            fontSize = 20.sp,
+            fontSize = 24.sp,
         )
 
         Spacer(modifier = Modifier.width(10.dp))
@@ -45,6 +45,7 @@ fun CharacterItem(playerCharacter: PlayerCharacter, modifier: Modifier = Modifie
 
         Text(
             text = playerCharacter.characterClass,
+            fontSize = 18.sp,
             modifier = Modifier
                 .weight(1f)
         )
@@ -57,7 +58,7 @@ fun CharacterItem(playerCharacter: PlayerCharacter, modifier: Modifier = Modifie
 
         Text(
             text = playerCharacter.level.toString(),
-            fontSize = 30.sp
+            fontSize = 33.sp
         )
     }
 }
