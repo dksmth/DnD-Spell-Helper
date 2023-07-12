@@ -3,7 +3,6 @@ package com.example.dndspellhelper.presentation.character_selection
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -19,10 +18,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Card
-import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.ExposedDropdownMenuBox
-import androidx.compose.material.ExposedDropdownMenuDefaults
 import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Text
@@ -43,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
+import com.example.dndspellhelper.presentation.filter_spells.RowWithDropDownMenu
 import com.example.dndspellhelper.ui.theme.DnDSpellHelperTheme
 
 @Composable
@@ -103,11 +100,10 @@ fun NewCharacterCreationDialog(
     var level by remember { mutableStateOf("") }
     var attackModifier by remember { mutableStateOf("") }
     var spellSaveDiff by remember { mutableStateOf("") }
+    var abilityModifier by remember { mutableStateOf("") }
 
     Dialog(onDismissRequest = onDismiss) {
-        Card(
-            shape = RoundedCornerShape(20.dp)
-        ) {
+        Card(shape = RoundedCornerShape(20.dp)) {
             Column(
                 modifier = Modifier
                     .wrapContentSize()
@@ -120,13 +116,9 @@ fun NewCharacterCreationDialog(
                     modifier = Modifier.padding(bottom = 20.dp)
                 )
 
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "Name",
-                        fontSize = 16.sp
-                    )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+
+                    Text(text = "Name", fontSize = 16.sp)
 
                     Spacer(Modifier.width(10.dp))
 
@@ -139,136 +131,61 @@ fun NewCharacterCreationDialog(
 
                 Spacer(Modifier.height(10.dp))
 
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "Class",
-                        fontSize = 16.sp
-                    )
-
-                    Spacer(Modifier.width(10.dp))
-
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                    ) {
-                        ExposedDropdownMenuBox(
-                            expanded = expanded,
-                            onExpandedChange = {
-                                expanded = !expanded
-                            }
-                        ) {
-                            TextField(
-                                value = selectedClass,
-                                placeholder = { Text("Select your class") },
-                                onValueChange = {},
-                                readOnly = true,
-                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                            )
-
-                            ExposedDropdownMenu(
-                                expanded = expanded,
-                                onDismissRequest = { expanded = false }
-                            ) {
-                                classes.forEach { item ->
-                                    DropdownMenuItem(
-                                        content = { Text(text = item) },
-                                        onClick = {
-                                            selectedClass = item
-                                            expanded = false
-                                        }
-                                    )
-                                }
-                            }
-                        }
+                RowWithDropDownMenu(
+                    text = "Class",
+                    isMenuExpanded = expanded,
+                    actionOnExpandedChange = { expanded = !expanded },
+                    selectedItem = selectedClass,
+                    onDismissRequest = { expanded = false },
+                    dropdownMenuItems = classes,
+                    onClickAction = { item ->
+                        selectedClass = item
+                        expanded = false
                     }
-                }
+                )
 
                 Spacer(Modifier.height(10.dp))
 
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "Character level",
-                        fontSize = 16.sp
-                    )
-
-                    Spacer(Modifier.weight(1f))
-
-                    TextField(
-                        value = level,
-                        onValueChange = { level = it.take(2) },
-
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
-                        textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
-
-                        modifier = Modifier.width(60.dp)
-                    )
-                }
+                CharacterInfoInputRow(
+                    text = "Character level",
+                    textFieldValue = level,
+                    textFieldAction = { level = it.take(2) }
+                )
 
                 Spacer(Modifier.height(10.dp))
 
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "Spell attack modifier",
-                        fontSize = 16.sp
-                    )
-
-                    Spacer(Modifier.weight(1f))
-
-                    TextField(
-                        value = attackModifier,
-                        onValueChange = { attackModifier = it.take(2) },
-
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
-                        textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
-
-                        modifier = Modifier.width(60.dp)
-                    )
-                }
+                CharacterInfoInputRow(
+                    text = "Spell attack modifier",
+                    textFieldValue = attackModifier,
+                    textFieldAction = { attackModifier = it.take(2) }
+                )
 
                 Spacer(Modifier.height(10.dp))
 
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
+                CharacterInfoInputRow(
+                    text = "Spell save DC",
+                    textFieldValue = spellSaveDiff,
+                    textFieldAction = {
+                        spellSaveDiff = it.take(2)
+                    }
+                )
 
-                    Text(
-                        text = "Spell save DC",
-                        fontSize = 16.sp
-                    )
+                Spacer(Modifier.height(10.dp))
 
-                    Spacer(Modifier.weight(1f))
-
-                    TextField(
-                        value = spellSaveDiff,
-                        onValueChange = { spellSaveDiff = it.take(2) },
-
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
-                        textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
-
-                        modifier = Modifier
-                            .width(60.dp)
-                    )
-                }
+                CharacterInfoInputRow(
+                    text = "Spellcasting ability modifier",
+                    textFieldValue = abilityModifier,
+                    textFieldAction = {
+                        abilityModifier = it.take(2)
+                    }
+                )
 
                 Spacer(Modifier.height(20.dp))
 
-                Row(
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    TextButton(
-                        onClick = { onDismiss() }
-                    ) {
-                        Text(
-                            text = "Cancel",
-                            color = Color(0xFFCC7575),
-                            fontSize = 18.sp
-                        )
+                Row(horizontalArrangement = Arrangement.SpaceBetween) {
+
+                    TextButton(onClick = onDismiss) {
+                        Text(text = "Cancel", color = Color(0xFFCC7575), fontSize = 18.sp)
                     }
 
                     Spacer(Modifier.weight(1f))
@@ -284,7 +201,8 @@ fun NewCharacterCreationDialog(
                                     selectedClass,
                                     level.toInt(),
                                     attackModifier.toInt(),
-                                    spellSaveDiff.toInt()
+                                    spellSaveDiff.toInt(),
+                                    abilityModifier.toInt()
                                 )
                                 onDismiss()
                             }
@@ -292,15 +210,42 @@ fun NewCharacterCreationDialog(
                     ) {
                         val color = if (canBeSaved) Color(0xFF2196F3) else Color.Gray
 
-                        Text(
-                            text = "Create Character",
-                            color = color,
-                            fontSize = 18.sp
-                        )
+                        Text(text = "Create Character", color = color, fontSize = 18.sp)
                     }
                 }
             }
         }
+    }
+}
+
+
+@Composable
+fun CharacterInfoInputRow(
+    text: String,
+    textFieldValue: String,
+    textFieldAction: (String) -> Unit,
+) {
+    val pattern = remember { Regex("^\\d+\$") }
+
+    Row(verticalAlignment = Alignment.CenterVertically) {
+
+        Text(text = text, fontSize = 16.sp)
+
+        Spacer(Modifier.weight(1f))
+
+        TextField(
+            value = textFieldValue,
+            onValueChange = {
+                if (it.isEmpty() || it.matches(pattern)) {
+                    textFieldAction(it)
+                }
+            },
+
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
+            textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
+
+            modifier = Modifier.width(60.dp)
+        )
     }
 }
 

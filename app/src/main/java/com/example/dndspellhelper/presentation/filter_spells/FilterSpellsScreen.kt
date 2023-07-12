@@ -186,7 +186,7 @@ fun FilterSpellsScreen(navController: NavController, viewModel: SpellListViewMod
 
 @Composable
 @OptIn(ExperimentalMaterialApi::class)
-private fun RowWithDropDownMenu(
+fun RowWithDropDownMenu(
     text: String,
     isMenuExpanded: Boolean,
     actionOnExpandedChange: () -> Unit,

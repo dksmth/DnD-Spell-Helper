@@ -14,16 +14,6 @@ data class PlayerCharacter(
     val knownSpells: List<Spell> = listOf(),
     val attackModifier: Int,
     val spellDC: Int,
+    val abilityModifier: Int,
     val spellCasting: List<SpellSlot> = listOf()
-) {
-    constructor() :
-        this(
-            name = "Mir",
-            characterClass = "Bard",
-            level = 7,
-            knownSpells = listOf<Spell>(),
-            attackModifier = 16,
-            spellDC = 16
-        )
-
-}
+)

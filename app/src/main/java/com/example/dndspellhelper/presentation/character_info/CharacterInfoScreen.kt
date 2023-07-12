@@ -208,7 +208,7 @@ private fun PlayerStats(character: PlayerCharacter?) {
 
         StatsColumn("Spell DC", character.spellDC.toString())
 
-        StatsColumn("Ability Modifier", character.attackModifier.toString())
+        StatsColumn("Ability Modifier", character.abilityModifier.toString())
 
         // Добавить введение Ability Modifier при создании персонажа
     }

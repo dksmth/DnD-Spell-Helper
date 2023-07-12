@@ -49,14 +49,15 @@ class CharactersViewModel @Inject constructor(private val spellsRepository: Spel
         level: Int,
         attackModifier: Int,
         spellDC: Int,
-        baseAbilityMod: Int = 0,
+        abilityMod: Int,
     ) {
         val newCharacter = PlayerCharacter(
             name = name,
             characterClass = characterClass,
             level = level,
             attackModifier = attackModifier,
-            spellDC = spellDC
+            spellDC = spellDC,
+            abilityModifier = abilityMod
         )
 
         viewModelScope.launch(Dispatchers.IO) {
