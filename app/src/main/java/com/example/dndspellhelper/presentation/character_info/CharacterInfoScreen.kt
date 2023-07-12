@@ -75,8 +75,57 @@ fun CharacterInfoScreen(navController: NavController, viewModel: CharactersViewM
                 )
             }
 
+            val knownCantrips = character!!.knownSpells.filter { it.level == 0 }
 
-            for (i in defaultSpellSlots.indices) {
+            Row(
+                verticalAlignment = CenterVertically,
+                modifier = Modifier.padding(vertical = 10.dp)
+            ) {
+                Text(
+                    text = "Cantrips",
+                    fontSize = 25.sp,
+                    modifier = Modifier.weight(1f)
+                )
+
+
+
+                Text(text = "${knownCantrips.size} / ${defaultSpellSlots[0].amountAtLevel}", fontSize = 30.sp)
+
+                Spacer(Modifier.width(15.dp))
+            }
+
+            Column {
+                knownCantrips.forEach { spell ->
+                    ItemForList(
+                        spell = spell,
+                        modifier = Modifier.clickable {
+                            viewModel.emitSpell(spell)
+                            viewModel.showAddButton = false
+                            navController.navigate("spell_info_from_character")
+                        },
+                        showLevel = false,
+                        action = {
+                            viewModel.deleteSpellFromSpellList(spell)
+                        }
+                    )
+
+                    Divider()
+                }
+            }
+
+            Button(
+                onClick = {
+                    viewModel.filterClassSpellsForLevel(0)
+                    navController.navigate("pick_spells")
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = "Add cantrips"
+                )
+            }
+
+            for (i in 1 until defaultSpellSlots.size) {
 
                 Row(
                     verticalAlignment = CenterVertically,
@@ -209,8 +258,6 @@ private fun PlayerStats(character: PlayerCharacter?) {
         StatsColumn("Spell DC", character.spellDC.toString())
 
         StatsColumn("Ability Modifier", character.abilityModifier.toString())
-
-        // Добавить введение Ability Modifier при создании персонажа
     }
 }
 

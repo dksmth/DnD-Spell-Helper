@@ -22,12 +22,12 @@ data class Spellcasting(
         val list = mutableListOf<SpellSlot>()
 
         val string =
-            "$spell_slots_level_1" + "$spell_slots_level_2" + "$spell_slots_level_3" + "$spell_slots_level_4" + "$spell_slots_level_5" + "$spell_slots_level_6" +
+            "$cantrips_known" + "$spell_slots_level_1" + "$spell_slots_level_2" + "$spell_slots_level_3" + "$spell_slots_level_4" + "$spell_slots_level_5" + "$spell_slots_level_6" +
                     "$spell_slots_level_7" + "$spell_slots_level_8" + "$spell_slots_level_9"
 
         for (i in string.indices) {
             if (string[i].digitToInt() != 0) {
-                list.add(SpellSlot(i + 1, string[i].digitToInt()))
+                list.add(SpellSlot(i, string[i].digitToInt()))
             }
         }
 
