@@ -3,6 +3,7 @@ package com.example.dndspellhelper.data
 import com.example.dndspellhelper.data.local.SpellsDatabase
 import com.example.dndspellhelper.data.remote.SpellsApi
 import com.example.dndspellhelper.data.remote.dto.character_level.ClassLevel
+import com.example.dndspellhelper.data.remote.dto.character_level.Spellcasting
 import com.example.dndspellhelper.data.remote.dto.spell.SpellDto
 import com.example.dndspellhelper.models.PlayerCharacter
 import com.example.dndspellhelper.models.Spell
@@ -46,9 +47,24 @@ class SpellsRepository @Inject constructor(
     private suspend fun getFullSpellcasting(className: String): ArrayList<ClassLevel> =
         api.getSpellcastingForClass(className)
 
-    suspend fun getSpellcastingForClassAndLevel(className: String, level: Int): ClassLevel {
+    suspend fun getClassLevelInfo(className: String, level: Int): ClassLevel {
         val validatedLevel = if (level > 20) 19 else level - 1
         return getFullSpellcasting(className)[validatedLevel]
+    }
+
+    suspend fun getClassLevelInfo(playerCharacter: PlayerCharacter): ClassLevel {
+        val validatedLevel = if (playerCharacter.level > 20) 19 else playerCharacter.level - 1
+        return getFullSpellcasting(playerCharacter.characterClass.lowercase())[validatedLevel]
+    }
+
+    suspend fun getSpellcastingForCharacter(character: PlayerCharacter): Spellcasting {
+        val classLevel = getClassLevelInfo(character)
+        return classLevel.spellcasting
+    }
+
+    suspend fun getSpellSlotsForCharacter(character: PlayerCharacter): List<SpellSlot> {
+        val spellcasting = getSpellcastingForCharacter(character)
+        return spellcasting.getSpellcastingPairs()
     }
 
     suspend fun updateCharacterSpells(newList: List<Spell>, id: String) =

@@ -43,7 +43,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
-import com.example.dndspellhelper.models.PlayerCharacter
 import com.example.dndspellhelper.ui.theme.DnDSpellHelperTheme
 
 @Composable
@@ -79,7 +78,7 @@ fun CharacterSelectScreen(navController: NavController, viewModel: CharactersVie
             LazyColumn(Modifier.fillMaxSize()) {
                 items(characters) { character ->
                     CharacterItem(character, Modifier.clickable {
-                        viewModel.changeCharacter(character)
+                        viewModel.setCharacter(character)
                         navController.navigate("character_info")
                     })
                 }
@@ -274,32 +273,24 @@ fun NewCharacterCreationDialog(
 
                     Spacer(Modifier.weight(1f))
 
-                    val canSave = listOf(
-                        name,
-                        selectedClass,
-                        level,
-                        attackModifier,
-                        spellSaveDiff
-                    ).none { it == "" }
+                    val canBeSaved =
+                        canBeSaved(name, selectedClass, level, attackModifier, spellSaveDiff)
 
                     TextButton(
                         onClick = {
-                            if (canSave) {
-
-                                val character = PlayerCharacter(
-                                    name = name,
-                                    characterClass = selectedClass,
-                                    level = level.toInt(),
-                                    attackModifier = attackModifier.toInt(),
-                                    spellDC = spellSaveDiff.toInt()
+                            if (canBeSaved) {
+                                viewModel.createNewCharacter(
+                                    name,
+                                    selectedClass,
+                                    level.toInt(),
+                                    attackModifier.toInt(),
+                                    spellSaveDiff.toInt()
                                 )
-
-                                viewModel.createNewCharacter(character)
                                 onDismiss()
                             }
                         },
                     ) {
-                        val color = if (canSave) Color(0xFF2196F3) else Color.Gray
+                        val color = if (canBeSaved) Color(0xFF2196F3) else Color.Gray
 
                         Text(
                             text = "Create Character",
@@ -311,5 +302,18 @@ fun NewCharacterCreationDialog(
             }
         }
     }
+}
+
+private fun canBeSaved(
+    name: String,
+    selectedClass: String,
+    level: String,
+    attackModifier: String,
+    spellSaveDiff: String,
+): Boolean {
+    return listOf(name, selectedClass, level, attackModifier, spellSaveDiff).none { it == "" }
+            && level.toInt() in 1..20
+            && attackModifier.toInt() != 0
+            && spellSaveDiff.toInt() != 0
 }
 

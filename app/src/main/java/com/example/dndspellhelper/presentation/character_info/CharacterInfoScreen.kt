@@ -40,8 +40,7 @@ import com.example.dndspellhelper.presentation.spell_list.ItemForList
 fun CharacterInfoScreen(navController: NavController, viewModel: CharactersViewModel) {
 
     val character by viewModel.character.collectAsState()
-    val currentSpellSlots = viewModel.characterInfo
-    val defaultSpellSlots = viewModel.spellSlots
+    val defaultSpellSlots = viewModel.defaultSpellSlots
 
     if (character != null) {
 
@@ -89,7 +88,7 @@ fun CharacterInfoScreen(navController: NavController, viewModel: CharactersViewM
                         modifier = Modifier.weight(1f)
                     )
 
-                    if (currentSpellSlots[i].amountAtLevel != 0) {
+                    if (character!!.spellCasting[i].amountAtLevel != 0) {
 
                         IconButton(
                             onClick = { viewModel.minusSpellSlotAtLevel(defaultSpellSlots[i].slot_level - 1) },
@@ -105,13 +104,13 @@ fun CharacterInfoScreen(navController: NavController, viewModel: CharactersViewM
                     Spacer(modifier = Modifier.width(10.dp))
 
                     Text(
-                        text = "${currentSpellSlots[i].amountAtLevel}",
+                        text = "${character!!.spellCasting[i].amountAtLevel}",
                         fontSize = 30.sp
                     )
 
                     Spacer(modifier = Modifier.width(5.dp))
 
-                    if (currentSpellSlots[i].amountAtLevel != defaultSpellSlots[i].amountAtLevel) {
+                    if (character!!.spellCasting[i].amountAtLevel != defaultSpellSlots[i].amountAtLevel) {
 
                         IconButton(
 
@@ -176,13 +175,12 @@ private fun NameClassAndLevel(character: PlayerCharacter?) {
         Column(
             modifier = Modifier
                 .weight(1f)
-                .padding(top = 30.dp)
         ) {
-            Text(text = character!!.name, fontSize = 30.sp)
+            Text(text = character!!.characterClass)
 
             Spacer(Modifier.height(10.dp))
 
-            Text(text = character.characterClass)
+            Text(text = character.name, fontSize = 30.sp)
         }
 
         Column(

@@ -3,9 +3,10 @@ package com.example.dndspellhelper.presentation.character_selection
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.dndspellhelper.data.SpellsRepository
-import com.example.dndspellhelper.data.remote.dto.character_level.ClassLevel
+import com.example.dndspellhelper.data.remote.dto.character_level.Spellcasting
 import com.example.dndspellhelper.models.PlayerCharacter
 import com.example.dndspellhelper.models.Spell
+import com.example.dndspellhelper.models.SpellSlot
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,9 +21,6 @@ class CharactersViewModel @Inject constructor(private val spellsRepository: Spel
     private val _allCharacters = MutableStateFlow(listOf<PlayerCharacter>())
     val allCharacters = _allCharacters.asStateFlow()
 
-    private val _characterClassAndLevelInfo = MutableStateFlow<ClassLevel?>(null)
-    val characterInfo = _characterClassAndLevelInfo.asStateFlow()
-
     private val _character = MutableStateFlow<PlayerCharacter?>(null)
     val character = _character.asStateFlow()
 
@@ -32,77 +30,70 @@ class CharactersViewModel @Inject constructor(private val spellsRepository: Spel
     private val _chosenSpell = MutableStateFlow<Spell?>(null)
     val chosenSpell = _chosenSpell.asStateFlow()
 
+    var defaultSpellSlots: List<SpellSlot> = Spellcasting().getSpellcastingPairs()
+
     var showAddButton = false
 
     init {
         getAllCharacters()
     }
 
-    private fun getAllCharacters() {
-        viewModelScope.launch {
-            _allCharacters.emit(spellsRepository.getAllCharacters())
-        }
-    }
+    private fun getAllCharacters() =
+        viewModelScope.launch(Dispatchers.IO) { _allCharacters.emit(spellsRepository.getAllCharacters()) }
 
-    fun emitSpell(spell: Spell) {
-        viewModelScope.launch {
-            _chosenSpell.emit(spell)
-        }
-    }
+    fun emitSpell(spell: Spell) = viewModelScope.launch { _chosenSpell.emit(spell) }
 
-    fun insertCharacter(playerCharacter: PlayerCharacter) {
-        viewModelScope.launch(Dispatchers.IO) {
-            spellsRepository.insertCharacter(playerCharacter)
-
-            _allCharacters.emit(_allCharacters.value + playerCharacter)
-        }
-    }
-
-    fun getSpellsForLevelAndClass(level: Int) {
-        val characterClass = _character.value!!.characterClass
+    fun createNewCharacter(
+        name: String,
+        characterClass: String,
+        level: Int,
+        attackModifier: Int,
+        spellDC: Int,
+        baseAbilityMod: Int = 0,
+    ) {
+        val newCharacter = PlayerCharacter(
+            name = name,
+            characterClass = characterClass,
+            level = level,
+            attackModifier = attackModifier,
+            spellDC = spellDC
+        )
 
         viewModelScope.launch(Dispatchers.IO) {
-            val filterForLevel = spellsRepository.getSpellWithLevel(level)
+            val spellSlots = spellsRepository.getSpellSlotsForCharacter(newCharacter)
+            val newCharacterWithSpellcasting = newCharacter.copy(spellCasting = spellSlots)
 
-            val filterForClass = filterForLevel.filter { spell ->
-                spell.classNames.any { playerClass -> playerClass.name == characterClass }
-            }
-
-            val filterForDuplicates = filterForClass.filter { it !in character.value!!.knownSpells }
-
-            _filteredSpells.emit(filterForDuplicates)
-        }
-    }
-
-    fun addNewSpellToCharacterSpellList(spell: Spell) {
-        val newList = _character.value!!.knownSpells + spell
-
-        viewModelScope.launch {
-            spellsRepository.updateCharacterSpells(newList, _character.value!!.name)
-
-            _character.emit(_character.value!!.copy(knownSpells = newList))
-            getAllCharacters()
+            spellsRepository.insertCharacter(newCharacterWithSpellcasting)
+            _allCharacters.emit(_allCharacters.value + newCharacterWithSpellcasting)
         }
     }
 
     fun setCharacter(character: PlayerCharacter) {
         viewModelScope.launch {
+            defaultSpellSlots = spellsRepository.getSpellSlotsForCharacter(character)
+
             _character.emit(character)
-
-            val characterLevel = if (character.level > 20) 19 else character.level - 1
-
-            _characterClassAndLevelInfo.emit(
-                spellsRepository.getSpellcastingForClassAndLevel(
-                    character.characterClass.lowercase(),
-                    characterLevel
-                )
-            )
         }
     }
 
-    fun deleteSpellFromList(spell: Spell) {
-        val newList = _character.value!!.knownSpells - spell
+    fun filterClassSpellsForLevel(level: Int) {
+        val playerClass = _character.value!!.characterClass
 
+        viewModelScope.launch(Dispatchers.IO) {
+            val filtered =
+                spellsRepository.getSpellWithLevel(level)
+                    .filter { spell ->
+                        spell.classNames.any { charClass -> charClass.name == playerClass }
+                    }
+                    .filter { spell ->
+                        spell !in character.value!!.knownSpells
+                    }
+
+            _filteredSpells.emit(filtered)
+        }
+    }
+
+    private fun updateCharacterSpellList(newList: List<Spell>) {
         viewModelScope.launch {
             spellsRepository.updateCharacterSpells(newList, _character.value!!.name)
 
@@ -110,4 +101,42 @@ class CharactersViewModel @Inject constructor(private val spellsRepository: Spel
             getAllCharacters()
         }
     }
+
+    fun addSpellToSpellList(spell: Spell) =
+        updateCharacterSpellList(_character.value!!.knownSpells + spell)
+
+    fun deleteSpellFromSpellList(spell: Spell) =
+        updateCharacterSpellList(_character.value!!.knownSpells - spell)
+
+    private fun updateCharacterSpellSlots(level: Int, newValue: Int) {
+        val newSpellSlotsList = _character.value?.spellCasting?.toMutableList()
+
+        newSpellSlotsList?.set(level, newSpellSlotsList[level].copy(amountAtLevel = newValue))
+
+        viewModelScope.launch {
+            spellsRepository.updateCharacterSpellcasting(newSpellSlotsList!!.toList(), character.value!!.name)
+
+            _character.emit(_character.value!!.copy(spellCasting = newSpellSlotsList))
+            getAllCharacters()
+        }
+    }
+
+    fun minusSpellSlotAtLevel(level: Int) =
+        updateCharacterSpellSlots(
+            level,
+            (_character.value?.spellCasting?.get(level)?.amountAtLevel ?: 1) - 1
+        )
+
+    fun plusSpellSlotAtLevel(level: Int) =
+        updateCharacterSpellSlots(
+            level,
+            (_character.value?.spellCasting?.get(level)?.amountAtLevel ?: 1) + 1
+        )
+
+    fun refreshCharacterSpellSlots() {
+        viewModelScope.launch {
+            _character.emit(_character.value!!.copy(spellCasting = defaultSpellSlots))
+        }
+    }
+
 }
