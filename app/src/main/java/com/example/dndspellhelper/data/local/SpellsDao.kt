@@ -33,6 +33,9 @@ interface SpellsDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertCharacter(playerCharacter: PlayerCharacter)
 
+    @Query("DELETE FROM characters WHERE name = :name")
+    suspend fun deleteCharacter(name: String)
+
     @Query("SELECT * FROM characters")
     suspend fun getAllCharacters(): List<PlayerCharacter>
 

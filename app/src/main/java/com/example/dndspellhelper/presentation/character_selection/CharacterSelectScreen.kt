@@ -16,7 +16,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Card
 import androidx.compose.material.Divider
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.FabPosition
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
@@ -62,15 +61,11 @@ fun CharacterSelectScreen(navController: NavController, viewModel: CharactersVie
                 ) {
                     Icon(Icons.Filled.Add, contentDescription = "Add character")
                 }
-            },
-            floatingActionButtonPosition = FabPosition.End
+            }, floatingActionButtonPosition = FabPosition.End
         ) {
 
             if (showDialog) {
-                NewCharacterCreationDialog(
-                    onDismiss = { showDialog = false },
-                    viewModel
-                )
+                NewCharacterCreationDialog(onDismiss = { showDialog = false }, viewModel)
             }
 
             Column(
@@ -78,41 +73,15 @@ fun CharacterSelectScreen(navController: NavController, viewModel: CharactersVie
                     .padding(it)
                     .padding(top = 10.dp)
             ) {
-
-//            OutlinedButton(
-//                onClick = { showDialog = true },
-//                colors = ButtonDefaults.buttonColors(backgroundColor = Color.Transparent),
-//                border = BorderStroke(1.dp, Color(0xFF2196F3)),
-//                modifier = Modifier.fillMaxWidth()
-//            ) {
-//                Text(
-//                    text = "Create new Character",
-//                    fontSize = 20.sp,
-//                    color = Color(0xFF2196F3)
-//                )
-//            }
-
-//                FloatingActionButton(
-//                    onClick = { showDialog = true },
-//                    backgroundColor = Color(0xFF2196F3),
-//                    contentColor = Color.White
-//                ) {
-//                    Icon(Icons.Filled.Add, contentDescription = "Add character")
-//                }
-//
-//                if (showDialog) {
-//                    NewCharacterCreationDialog(
-//                        onDismiss = { showDialog = false },
-//                        viewModel
-//                    )
-//                }
-
                 LazyColumn(Modifier.fillMaxSize()) {
                     items(characters) { character ->
-                        CharacterItem(character, Modifier.clickable {
-                            viewModel.setCharacter(character)
-                            navController.navigate("character_info")
-                        })
+                        CharacterItem(character,
+                            Modifier
+                                .clickable {
+                                    viewModel.setCharacter(character)
+                                    navController.navigate("character_info")
+                                }
+                        )
 
                         Divider()
                     }
@@ -123,7 +92,6 @@ fun CharacterSelectScreen(navController: NavController, viewModel: CharactersVie
 }
 
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun NewCharacterCreationDialog(
     onDismiss: () -> Unit,
@@ -228,8 +196,19 @@ fun NewCharacterCreationDialog(
 
                     Spacer(Modifier.weight(1f))
 
-                    val canBeSaved =
-                        canBeSaved(name, selectedClass, level, attackModifier, spellSaveDiff)
+                    val isInputValidated =
+                        canBeSaved(
+                            name,
+                            selectedClass,
+                            level,
+                            attackModifier,
+                            spellSaveDiff,
+                            abilityModifier
+                        )
+
+                    val nameIsValid = viewModel.nameNotInCharacterNames(name)
+
+                    val canBeSaved = isInputValidated && nameIsValid
 
                     TextButton(
                         onClick = {
@@ -293,10 +272,20 @@ private fun canBeSaved(
     level: String,
     attackModifier: String,
     spellSaveDiff: String,
+    abilityModifier: String,
 ): Boolean {
-    return listOf(name, selectedClass, level, attackModifier, spellSaveDiff).none { it == "" }
+    return listOf(
+        name,
+        selectedClass,
+        level,
+        attackModifier,
+        spellSaveDiff,
+        abilityModifier
+    ).none { it == "" }
             && level.toInt() in 1..20
-            && attackModifier.toInt() != 0
-            && spellSaveDiff.toInt() != 0
+            && attackModifier.toInt() in 1..100
+            && spellSaveDiff.toInt() in 1..100
+            && abilityModifier.toInt() in 1..100
+
 }
 

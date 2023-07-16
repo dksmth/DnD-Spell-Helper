@@ -69,6 +69,17 @@ class CharactersViewModel @Inject constructor(private val spellsRepository: Spel
         }
     }
 
+    fun nameNotInCharacterNames(name: String): Boolean {
+        return _allCharacters.value.none { it.name == name }
+    }
+
+    fun deleteCharacter(playerCharacter: PlayerCharacter) {
+        viewModelScope.launch(Dispatchers.IO) {
+            _allCharacters.emit(_allCharacters.value - playerCharacter)
+            spellsRepository.deleteCharacters(playerCharacter.name)
+        }
+    }
+
     fun setCharacter(character: PlayerCharacter) {
         viewModelScope.launch(Dispatchers.IO) {
             defaultSpellSlots = spellsRepository.getSpellSlots(character)

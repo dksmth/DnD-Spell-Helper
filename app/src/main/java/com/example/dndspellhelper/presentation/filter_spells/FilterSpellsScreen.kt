@@ -21,6 +21,7 @@ import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Switch
 import androidx.compose.material.Text
+import androidx.compose.material.TextButton
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.TopAppBar
@@ -43,7 +44,6 @@ import androidx.navigation.NavController
 import com.example.dndspellhelper.presentation.spell_list.SpellListViewModel
 import com.example.dndspellhelper.ui.theme.DnDSpellHelperTheme
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun FilterSpellsScreen(navController: NavController, viewModel: SpellListViewModel) {
 
@@ -71,6 +71,15 @@ fun FilterSpellsScreen(navController: NavController, viewModel: SpellListViewMod
 
         Scaffold(topBar = {
             TopAppBar(Modifier.fillMaxWidth()) {
+
+                TextButton(onClick = {
+                    viewModel.onLevelChange(0..9)
+                    viewModel.onClassChange("Any")
+                    viewModel.onCastTimeChange("Any")
+                    viewModel.onRitualChange(false)
+                }) {
+                    Text("Return To Defaults")
+                }
 
                 Spacer(modifier = Modifier.weight(1f))
 

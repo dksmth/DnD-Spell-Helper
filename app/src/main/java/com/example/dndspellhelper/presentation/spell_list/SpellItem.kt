@@ -1,7 +1,7 @@
 package com.example.dndspellhelper.presentation.spell_list
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -35,13 +35,13 @@ fun ItemForList(
     action: (() -> Unit) = {},
 ) {
 
-    val color = if (spell.favourite) Color(0xFFE49328) else Color.Black
+    val color = if (spell.favourite) Color(0xFFDC95F5) else Color.Black
 
     Row(
         modifier = modifier
             .fillMaxWidth()
             .height(80.dp)
-            .background(color),
+            .border(width = 2.dp, color = color),
         verticalAlignment = Alignment.CenterVertically,
 
         ) {

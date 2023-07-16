@@ -49,6 +49,8 @@ class SpellsRepository @Inject constructor(
 
     suspend fun getAllCharacters(): List<PlayerCharacter> = dao.getAllCharacters()
 
+    suspend fun deleteCharacters(name: String) = dao.deleteCharacter(name)
+
     // Character Spells
 
     suspend fun updateCharacterSpells(newList: List<Spell>, id: String) =
