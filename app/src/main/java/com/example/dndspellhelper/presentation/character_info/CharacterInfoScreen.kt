@@ -17,9 +17,13 @@ import androidx.compose.material.Button
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -32,6 +36,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.dndspellhelper.R
 import com.example.dndspellhelper.models.PlayerCharacter
+import com.example.dndspellhelper.models.Spell
 import com.example.dndspellhelper.presentation.character_selection.CharactersViewModel
 import com.example.dndspellhelper.presentation.spell_list.ItemForList
 
@@ -44,172 +49,207 @@ fun CharacterInfoScreen(navController: NavController, viewModel: CharactersViewM
 
     if (character != null) {
 
-        Column(
-            modifier = Modifier
-                .padding(16.dp)
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState(0))
-        ) {
-            NameClassAndLevel(character)
+        Scaffold(topBar = {
+            TopAppBar(Modifier.fillMaxWidth()) {
 
-            Spacer(Modifier.height(20.dp))
+                IconButton(onClick = { navController.popBackStack() }) {
+                    Icon(imageVector = Icons.Default.ArrowBack, contentDescription = null)
+                }
 
-            PlayerStats(character)
-
-            Spacer(Modifier.height(30.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth()
-            ) {
                 Spacer(modifier = Modifier.weight(1f))
 
-                Icon(
-                    painter = painterResource(id = R.drawable.moon_icon),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(80.dp)
-                        .padding(end = 30.dp)
-                        .clickable {
-                            viewModel.refreshCharacterSpellSlots()
-                        }
-                )
-            }
+                IconButton(
+                    onClick = {
 
-            val knownCantrips = character!!.knownSpells.filter { it.level == 0 }
-
-            Row(
-                verticalAlignment = CenterVertically,
-                modifier = Modifier.padding(vertical = 10.dp)
-            ) {
-                Text(
-                    text = "Cantrips",
-                    fontSize = 25.sp,
-                    modifier = Modifier.weight(1f)
-                )
-
-
-
-                Text(text = "${knownCantrips.size} / ${defaultSpellSlots[0].amountAtLevel}", fontSize = 30.sp)
-
-                Spacer(Modifier.width(15.dp))
-            }
-
-            Column {
-                knownCantrips.forEach { spell ->
-                    ItemForList(
-                        spell = spell,
-                        modifier = Modifier.clickable {
-                            viewModel.emitSpell(spell)
-                            viewModel.showAddButton = false
-                            navController.navigate("spell_info_from_character")
-                        },
-                        showLevel = false,
-                        action = {
-                            viewModel.deleteSpellFromSpellList(spell)
-                        }
-                    )
-
-                    Divider()
-                }
-            }
-
-            Button(
-                onClick = {
-                    viewModel.filterClassSpellsForLevel(0)
-                    navController.navigate("pick_spells")
-                },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(
-                    text = "Add cantrips"
-                )
-            }
-
-            for (i in 1 until defaultSpellSlots.size) {
-
-                Row(
-                    verticalAlignment = CenterVertically,
-                    modifier = Modifier.padding(vertical = 10.dp)
+                    }
                 ) {
-                    Text(
-                        text = "Level ${defaultSpellSlots[i].slot_level}",
-                        fontSize = 25.sp,
-                        modifier = Modifier.weight(1f)
-                    )
-
-                    if (character!!.spellCasting[i].amountAtLevel != 0) {
-
-                        IconButton(
-                            onClick = { viewModel.minusSpellSlotAtLevel(defaultSpellSlots[i].slot_level - 1) },
-                            modifier = Modifier.size(30.dp)
-                        ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.minus),
-                                contentDescription = null
-                            )
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.width(10.dp))
-
-                    Text(
-                        text = "${character!!.spellCasting[i].amountAtLevel}",
-                        fontSize = 30.sp
-                    )
-
-                    Spacer(modifier = Modifier.width(5.dp))
-
-                    if (character!!.spellCasting[i].amountAtLevel != defaultSpellSlots[i].amountAtLevel) {
-
-                        IconButton(
-
-                            onClick = { viewModel.plusSpellSlotAtLevel(defaultSpellSlots[i].slot_level - 1) },
-                            modifier = Modifier.size(30.dp)
-                        ) {
-                            Icon(
-                                Icons.Default.Add,
-                                contentDescription = null
-                            )
-                        }
-                    } else {
-                        Spacer(modifier = Modifier.width(30.dp))
-                    }
+                    Icon(imageVector = Icons.Default.Settings, contentDescription = null)
                 }
+            }
+        }, content = { it ->
 
-                val knownSpellsOfLevel =
-                    character!!.knownSpells.filter { it.level == defaultSpellSlots[i].slot_level }
+            Column(
+                modifier = Modifier
+                    .padding(it)
+                    .padding(16.dp)
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState(0))
+            ) {
+                NameClassAndLevel(character)
 
-                Column {
-                    knownSpellsOfLevel.forEach { spell ->
-                        ItemForList(
-                            spell = spell,
-                            modifier = Modifier.clickable {
-                                viewModel.emitSpell(spell)
+                Spacer(Modifier.height(20.dp))
+
+                PlayerStats(character)
+
+                Spacer(Modifier.height(30.dp))
+
+                RefreshSpellIcon(viewModel)
+
+                for (i in defaultSpellSlots.indices) {
+
+                    val (slotLevel, defaultAmountAtLevel) = defaultSpellSlots[i]
+
+                    if (defaultAmountAtLevel != 0) {
+                        val knownSpellsOfLevel =
+                            character!!.knownSpells.filter { it.level == slotLevel }
+
+                        val (_, currentAmountAtLevel) = character!!.spellCasting[i]
+
+                        LevelOfSpellSlots(
+                            slotLevel,
+                            knownSpellsOfLevel.size,
+                            defaultAmountAtLevel,
+                            currentAmountAtLevel,
+                            viewModel
+                        )
+
+                        ShowSpellsColumn(
+                            knownSpellsOfLevel = knownSpellsOfLevel,
+                            actionOnSpellClick = {
+                                viewModel.emitSpell(it)
                                 viewModel.showAddButton = false
                                 navController.navigate("spell_info_from_character")
                             },
-                            showLevel = false,
-                            action = {
-                                viewModel.deleteSpellFromSpellList(spell)
+                            actionOnDeleteSpell = {
+                                viewModel.deleteSpellFromSpellList(it)
                             }
                         )
 
-                        Divider()
+                        ButtonToAddSpellsOfLevel(
+                            level = defaultSpellSlots[i].slot_level,
+                            action = {
+                                viewModel.filterClassSpellsForLevel(defaultSpellSlots[i].slot_level)
+                                navController.navigate("pick_spells")
+                            }
+                        )
                     }
                 }
-
-                Button(
-                    onClick = {
-                        viewModel.filterClassSpellsForLevel(defaultSpellSlots[i].slot_level)
-                        navController.navigate("pick_spells")
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(
-                        text = "Add level ${defaultSpellSlots[i].slot_level} spell"
-                    )
-                }
             }
+        })
+    }
+}
+
+@Composable
+private fun RefreshSpellIcon(viewModel: CharactersViewModel) {
+    Row(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Spacer(modifier = Modifier.weight(1f))
+
+        Icon(
+            painter = painterResource(id = R.drawable.moon_icon),
+            contentDescription = null,
+            modifier = Modifier
+                .size(80.dp)
+                .padding(end = 30.dp)
+                .clickable {
+                    viewModel.refreshCharacterSpellSlots()
+                }
+        )
+    }
+}
+
+@Composable
+private fun LevelOfSpellSlots(
+    slotLevel: Int,
+    amountOfKnownSpells: Int,
+    defaultAmountAtLevel: Int,
+    currentAmountAtLevel: Int = 0,
+    viewModel: CharactersViewModel,
+) {
+    Row(
+        verticalAlignment = CenterVertically,
+        modifier = Modifier
+            .padding(vertical = 10.dp)
+    ) {
+        val isCantrip = slotLevel == 0
+
+        val spellSlotLevelText = if (isCantrip) "Cantrips" else "Level $slotLevel"
+
+        Text(text = spellSlotLevelText, fontSize = 25.sp, modifier = Modifier.weight(1f))
+
+        if (!isCantrip && currentAmountAtLevel != 0) {
+            MinusIcon(action = { viewModel.minusSpellSlotAtLevel(slotLevel) })
+        }
+
+        val amountAtLevel =
+            if (isCantrip) "$amountOfKnownSpells / $defaultAmountAtLevel" else "$currentAmountAtLevel"
+
+        Text(
+            text = amountAtLevel,
+            fontSize = 30.sp,
+            modifier = Modifier.padding(start = 10.dp, end = 5.dp)
+        )
+
+        val isMaxSpellSlots = currentAmountAtLevel != defaultAmountAtLevel
+        val showPlusIcon = !isCantrip && isMaxSpellSlots
+        val spacerWidth = if (!isCantrip) 30.dp else 5.dp
+
+        if (showPlusIcon) {
+            PlusIcon(action = { viewModel.plusSpellSlotAtLevel(slotLevel) })
+        } else {
+            Spacer(modifier = Modifier.width(spacerWidth))
+        }
+    }
+}
+
+
+@Composable
+private fun PlusIcon(action: () -> Unit) {
+    IconButton(
+        onClick = action,
+        modifier = Modifier.size(30.dp)
+    ) {
+        Icon(
+            Icons.Default.Add,
+            contentDescription = null
+        )
+    }
+}
+
+@Composable
+private fun MinusIcon(action: () -> Unit, modifier: Modifier = Modifier) {
+    IconButton(
+        onClick = action,
+        modifier = modifier.size(30.dp)
+    ) {
+        Icon(
+            painter = painterResource(id = R.drawable.minus),
+            contentDescription = null
+        )
+    }
+}
+
+@Composable
+private fun ButtonToAddSpellsOfLevel(level: Int, action: () -> Unit) {
+    Button(
+        onClick = action,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        val buttonPrompt = if (level == 0) "Add cantrips" else "Add level $level spell"
+
+        Text(buttonPrompt)
+    }
+}
+
+@Composable
+private fun ShowSpellsColumn(
+    knownSpellsOfLevel: List<Spell>,
+    actionOnSpellClick: (Spell) -> Unit,
+    actionOnDeleteSpell: (Spell) -> Unit,
+) {
+    Column {
+        knownSpellsOfLevel.forEach { spell ->
+            ItemForList(
+                spell = spell,
+                modifier = Modifier.clickable {
+                    actionOnSpellClick(spell)
+                },
+                showLevel = false,
+                action = { actionOnDeleteSpell(spell) }
+            )
+
+            Divider()
         }
     }
 }
