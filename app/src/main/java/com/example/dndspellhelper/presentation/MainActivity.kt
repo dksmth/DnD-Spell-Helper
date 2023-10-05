@@ -46,38 +46,38 @@ class MainActivity : ComponentActivity() {
 
                         NavHost(
                             navController = navController,
-                            startDestination = "spell_list",
+                            startDestination = SPELL_LIST_ROUTE,
                             modifier = Modifier.padding(padding)
                         ) {
-                            composable("spell_list") {
+                            composable(SPELL_LIST_ROUTE) {
                                 SpellList(navController)
                             }
                             composable(BottomBarScreen.Characters.route) {
                                 CharacterSelectScreen(navController, charactersViewModel)
                             }
-                            composable("spell_info") { navBackStackEntry ->
+                            composable(SPELL_INFO_ROUTE) { navBackStackEntry ->
                                 val parentEntry = remember(navBackStackEntry) {
-                                    navController.getBackStackEntry("spell_list")
+                                    navController.getBackStackEntry(SPELL_LIST_ROUTE)
                                 }
                                 val parentViewModel = hiltViewModel<SpellListViewModel>(parentEntry)
 
                                 SpellInfoScreen(parentViewModel.chosenSpell)
                             }
-                            composable("filter_spell") { navBackStackEntry ->
+                            composable(SPELL_FILTER_ROUTE) { navBackStackEntry ->
                                 val parentEntry = remember(navBackStackEntry) {
-                                    navController.getBackStackEntry("spell_list")
+                                    navController.getBackStackEntry(SPELL_LIST_ROUTE)
                                 }
                                 val parentViewModel = hiltViewModel<SpellListViewModel>(parentEntry)
 
                                 FilterSpellsScreen(navController, parentViewModel)
                             }
-                            composable("character_info") {
+                            composable(CHARACTER_INFO_ROUTE) {
                                 CharacterInfoScreen(navController, charactersViewModel)
                             }
-                            composable("pick_spells") {
+                            composable(PICK_SPELLS_ROUTE) {
                                 PickSpells(navController, charactersViewModel)
                             }
-                            composable("spell_info_from_character") {
+                            composable(SPELL_INFO_FROM_CHARACTER_ROUTE) {
                                 AddSpell(navController, charactersViewModel)
                             }
                         }
@@ -85,6 +85,15 @@ class MainActivity : ComponentActivity() {
                 )
             }
         }
+    }
+
+    companion object {
+        const val SPELL_LIST_ROUTE = "spell_list"
+        const val SPELL_INFO_ROUTE = "spell_info"
+        const val SPELL_FILTER_ROUTE = "filter_spell"
+        const val CHARACTER_INFO_ROUTE = "character_info"
+        const val PICK_SPELLS_ROUTE = "pick_spells"
+        const val SPELL_INFO_FROM_CHARACTER_ROUTE = "spell_info_from_character"
     }
 }
 

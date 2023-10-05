@@ -41,6 +41,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.text.isDigitsOnly
 import androidx.navigation.NavController
+import com.example.dndspellhelper.presentation.MainActivity.Companion.SPELL_LIST_ROUTE
 import com.example.dndspellhelper.presentation.spell_list.SpellListViewModel
 import com.example.dndspellhelper.ui.theme.DnDSpellHelperTheme
 
@@ -86,7 +87,7 @@ fun FilterSpellsScreen(navController: NavController, viewModel: SpellListViewMod
                 IconButton(
                     onClick = {
                         navController.popBackStack(
-                            route = "spell_list",
+                            route = SPELL_LIST_ROUTE,
                             inclusive = false
                         )
                     }

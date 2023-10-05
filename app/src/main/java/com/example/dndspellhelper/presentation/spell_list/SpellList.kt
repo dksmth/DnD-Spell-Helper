@@ -48,6 +48,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.dndspellhelper.R
 import com.example.dndspellhelper.models.Spell
+import com.example.dndspellhelper.presentation.MainActivity.Companion.SPELL_FILTER_ROUTE
+import com.example.dndspellhelper.presentation.MainActivity.Companion.SPELL_INFO_ROUTE
 import me.saket.swipe.SwipeAction
 import me.saket.swipe.SwipeableActionsBox
 
@@ -157,7 +159,7 @@ private fun SpellListTopBar(
 
         SortDropdownMenu(viewModel)
 
-        IconButton(onClick = { navController.navigate("filter_spell") }) {
+        IconButton(onClick = { navController.navigate(SPELL_FILTER_ROUTE) }) {
             Icon(
                 painter = painterResource(id = R.drawable.filter_icon),
 
@@ -198,7 +200,7 @@ private fun LazyColumnWithSpells(
                     modifier = Modifier
                         .clickable {
                             viewModel.chosenSpell = spell
-                            navController.navigate("spell_info")
+                            navController.navigate(SPELL_INFO_ROUTE)
                         }
                 )
             }

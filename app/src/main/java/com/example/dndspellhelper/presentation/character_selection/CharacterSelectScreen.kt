@@ -31,6 +31,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,8 +42,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
+import com.example.dndspellhelper.presentation.MainActivity.Companion.CHARACTER_INFO_ROUTE
 import com.example.dndspellhelper.presentation.filter_spells.RowWithDropDownMenu
 import com.example.dndspellhelper.ui.theme.DnDSpellHelperTheme
+
+
 
 @Composable
 fun CharacterSelectScreen(navController: NavController, viewModel: CharactersViewModel) {
@@ -79,7 +83,7 @@ fun CharacterSelectScreen(navController: NavController, viewModel: CharactersVie
                             Modifier
                                 .clickable {
                                     viewModel.setCharacter(character)
-                                    navController.navigate("character_info")
+                                    navController.navigate(CHARACTER_INFO_ROUTE)
                                 }
                         )
 
@@ -97,16 +101,16 @@ fun NewCharacterCreationDialog(
     onDismiss: () -> Unit,
     viewModel: CharactersViewModel,
 ) {
-    var name by remember { mutableStateOf("") }
+    var name by rememberSaveable { mutableStateOf("") }
 
     val classes = arrayOf("Bard", "Wizard", "Sorcerer")
-    var expanded by remember { mutableStateOf(false) }
-    var selectedClass by remember { mutableStateOf("") }
+    var expanded by rememberSaveable { mutableStateOf(false) }
+    var selectedClass by rememberSaveable { mutableStateOf("") }
 
-    var level by remember { mutableStateOf("") }
-    var attackModifier by remember { mutableStateOf("") }
-    var spellSaveDiff by remember { mutableStateOf("") }
-    var abilityModifier by remember { mutableStateOf("") }
+    var level by rememberSaveable{ mutableStateOf("") }
+    var attackModifier by rememberSaveable { mutableStateOf("") }
+    var spellSaveDiff by rememberSaveable { mutableStateOf("") }
+    var abilityModifier by rememberSaveable { mutableStateOf("") }
 
     Dialog(onDismissRequest = onDismiss) {
         Card(shape = RoundedCornerShape(20.dp)) {
@@ -282,10 +286,15 @@ private fun canBeSaved(
         spellSaveDiff,
         abilityModifier
     ).none { it == "" }
-            && level.toInt() in 1..20
-            && attackModifier.toInt() in 1..100
-            && spellSaveDiff.toInt() in 1..100
-            && abilityModifier.toInt() in 1..100
+            && level.toInt() in 1..MAX_LEVEL
+            && attackModifier.toInt() in 1..MAX_ATTACK_MOD
+            && spellSaveDiff.toInt() in 1..MAX_SPELLSAVE_MOD
+            && abilityModifier.toInt() in 1..MAX_ABILITY_MOD
 
 }
+
+const val MAX_LEVEL = 20
+const val MAX_ATTACK_MOD = 100
+const val MAX_SPELLSAVE_MOD = 100
+const val MAX_ABILITY_MOD = 100
 

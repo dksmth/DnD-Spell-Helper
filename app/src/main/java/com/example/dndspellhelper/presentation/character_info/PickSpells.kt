@@ -14,6 +14,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.dndspellhelper.presentation.MainActivity.Companion.CHARACTER_INFO_ROUTE
+import com.example.dndspellhelper.presentation.MainActivity.Companion.SPELL_INFO_FROM_CHARACTER_ROUTE
 import com.example.dndspellhelper.presentation.character_selection.CharactersViewModel
 import com.example.dndspellhelper.presentation.spell_list.ItemForList
 
@@ -40,12 +42,12 @@ fun PickSpells(
                                     onTap = {
                                         viewModel.emitSpell(spell)
                                         viewModel.showAddButton = true
-                                        navController.navigate("spell_info_from_character")
+                                        navController.navigate(SPELL_INFO_FROM_CHARACTER_ROUTE)
                                     },
                                     onLongPress = {
                                         viewModel.addSpellToSpellList(spell)
                                         navController.popBackStack(
-                                            route = "character_info",
+                                            route = CHARACTER_INFO_ROUTE,
                                             inclusive = false
                                         )
                                     }

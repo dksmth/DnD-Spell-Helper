@@ -41,7 +41,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -49,9 +51,15 @@ import androidx.navigation.NavController
 import com.example.dndspellhelper.R
 import com.example.dndspellhelper.models.PlayerCharacter
 import com.example.dndspellhelper.models.Spell
+import com.example.dndspellhelper.presentation.MainActivity.Companion.PICK_SPELLS_ROUTE
+import com.example.dndspellhelper.presentation.MainActivity.Companion.SPELL_INFO_FROM_CHARACTER_ROUTE
 import com.example.dndspellhelper.presentation.character_selection.CharactersViewModel
 import com.example.dndspellhelper.presentation.spell_list.ItemForList
 
+
+enum class DropDownMenuItems(val string: String) {
+    EDIT_CHARACTER("Edit character"), EDIT_SPSLOTS("Edit spellslots"), DELETE_CHARACTER("Delete character")
+}
 
 @Composable
 fun CharacterInfoScreen(navController: NavController, viewModel: CharactersViewModel) {
@@ -77,19 +85,17 @@ fun CharacterInfoScreen(navController: NavController, viewModel: CharactersViewM
                         Icon(imageVector = Icons.Default.Settings, contentDescription = null)
                     }
 
-                    val dropDownMenuItems =
-                        listOf("Edit character", "Edit spellslots", "Delete Character")
-
                     DropdownMenu(
                         expanded = expanded,
                         onDismissRequest = { expanded = false },
                     ) {
-                        dropDownMenuItems.forEach { item ->
+                        enumValues<DropDownMenuItems>().forEach {
                             DropdownMenuItem(onClick = {
-                                if (item == "Delete Character") showDeleteDialog = true
+                                if (it == DropDownMenuItems.DELETE_CHARACTER) showDeleteDialog =
+                                    true
                             }) {
                                 Text(
-                                    text = item,
+                                    text = it.string,
                                     fontSize = 16.sp,
                                 )
                             }
@@ -124,7 +130,7 @@ fun CharacterInfoScreen(navController: NavController, viewModel: CharactersViewM
                                     viewModel.deleteCharacter(character!!)
                                     navController.popBackStack()
                                 }) {
-                                    Text("Yes", color = Color(0xFFCC7575))
+                                    Text(stringResource(id = R.string.delete_character_yes), color = colorResource(id = R.color.forYesButton))
                                 }
                             }
                         }
@@ -172,7 +178,7 @@ fun CharacterInfoScreen(navController: NavController, viewModel: CharactersViewM
                             actionOnSpellClick = {
                                 viewModel.emitSpell(it)
                                 viewModel.showAddButton = false
-                                navController.navigate("spell_info_from_character")
+                                navController.navigate(SPELL_INFO_FROM_CHARACTER_ROUTE)
                             },
                             actionOnDeleteSpell = {
                                 viewModel.deleteSpellFromSpellList(it)
@@ -183,7 +189,7 @@ fun CharacterInfoScreen(navController: NavController, viewModel: CharactersViewM
                             level = defaultSpellSlots[i].slot_level,
                             action = {
                                 viewModel.filterClassSpellsForLevel(defaultSpellSlots[i].slot_level)
-                                navController.navigate("pick_spells")
+                                navController.navigate(PICK_SPELLS_ROUTE)
                             }
                         )
                     }
