@@ -1,11 +1,10 @@
 package com.example.dndspellhelper.models
 
-import android.os.Parcelable
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import kotlinx.parcelize.Parcelize
+import com.example.dndspellhelper.data.remote.dto.spell.ClassName
 
-@Parcelize
+
 @Entity(
     tableName = "spells"
 )
@@ -22,5 +21,6 @@ data class Spell(
     val name: String,
     val range: String,
     val ritual: Boolean,
-    val favourite: Boolean = false
-): Parcelable
+    val favourite: Boolean = false,
+    val classNames: List<ClassName>
+)

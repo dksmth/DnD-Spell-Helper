@@ -1,6 +1,8 @@
 package com.example.dndspellhelper.data
 
-import com.example.dndspellhelper.data.remote.dto.SpellDto
+import com.example.dndspellhelper.data.remote.dto.character_level.ClassLevelDto
+import com.example.dndspellhelper.data.remote.dto.spell.SpellDto
+import com.example.dndspellhelper.models.ClassLevel
 import com.example.dndspellhelper.models.Spell
 
 fun SpellDto.toSpell(): Spell {
@@ -15,6 +17,15 @@ fun SpellDto.toSpell(): Spell {
         name = name,
         range = range,
         ritual = ritual,
-        material = material
+        material = material,
+        classNames = classes
+    )
+}
+
+fun ClassLevelDto.toClassLevel(): ClassLevel {
+    return ClassLevel(
+        className = `class`.name,
+        level = level,
+        spellcasting = spellcasting
     )
 }

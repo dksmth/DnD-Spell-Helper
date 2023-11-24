@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">DnD Spell Helper</string>
+    <string name="delete_character_yes">Yes</string>
 </resources>
