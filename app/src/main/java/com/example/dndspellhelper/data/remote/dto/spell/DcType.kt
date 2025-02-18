@@ -1,4 +1,4 @@
-package com.example.dndspellhelper.data.remote.dto
+package com.example.dndspellhelper.data.remote.dto.spell
 
 data class DcType(
     val index: String,

@@ -105,4 +105,6 @@ dependencies {
     implementation "me.saket.swipe:swipe:1.2.0"
 
     implementation 'javax.annotation:javax.annotation-api:1.3.2'
+
+    implementation "androidx.lifecycle:lifecycle-runtime-compose:2.6.1"
 }

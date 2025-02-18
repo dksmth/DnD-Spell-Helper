@@ -1,10 +1,10 @@
-package com.example.dndspellhelper.data.remote.dto
+package com.example.dndspellhelper.data.remote.dto.spell
 
 
 data class SpellDto(
     val attack_type: String?,
     val casting_time: String,
-    val classes: List<Class>,
+    val classes: List<ClassName>,
     val components: List<String>,
     val concentration: Boolean,
     val damage: Damage?,

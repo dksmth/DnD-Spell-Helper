@@ -4,15 +4,14 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.runtime.Composable
 import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -21,24 +20,21 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.dndspellhelper.R
-import com.example.dndspellhelper.presentation.spell_list.ActivityViewModel
+import com.example.dndspellhelper.models.Spell
 import com.example.dndspellhelper.ui.theme.DnDSpellHelperTheme
 
 
 @Composable
 fun SpellInfoScreen(
-    myViewModel: ActivityViewModel
+    spell: Spell, modifier: Modifier = Modifier
 ) {
     DnDSpellHelperTheme {
-
-        val spell = myViewModel.chosenSpell
-
         Column(
-            modifier = Modifier
-                .fillMaxSize()
+            modifier = modifier
+                //.fillMaxSize()
                 .padding(start = 7.dp, end = 10.dp, top = 20.dp, bottom = 10.dp)
+                .verticalScroll(rememberScrollState(0))
         ) {
-
             Row {
                 Text(
                     text = spell.name,
@@ -96,7 +92,7 @@ fun SpellInfoScreen(
             MultipleRowsWithStuff(
                 mapOfTitlesAndValues = mapOf(
                     "Duration" to spell.duration,
-                    "Classes" to "TODO",
+                    "Classes" to (spell.classNames.joinToString(separator = ", ")),
                     "Subclasses" to "TODO"
                 ))
 
@@ -106,7 +102,6 @@ fun SpellInfoScreen(
                 text = spell.desc.joinToString(separator = "\n\n") { it.removeSurrounding("\"") },
                 modifier = Modifier
                     .padding(start = 2.dp, end = 10.dp)
-                    .verticalScroll(rememberScrollState(0))
             )
         }
     }
