@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -81,12 +82,16 @@ fun SpellList(
                 Modifier.padding(scaffoldPadding)
             )
         } else {
-            Column(Modifier.padding(scaffoldPadding)) {
+            Column(
+                Modifier
+                    .padding(scaffoldPadding)
+                    .fillMaxSize(),
+                horizontalAlignment = CenterHorizontally
+            ) {
                 Text(
                     text = "No spells found...",
                     fontSize = 30.sp,
                     modifier = Modifier
-                        .align(CenterHorizontally)
                         .padding(vertical = 30.dp)
                 )
             }
@@ -178,7 +183,12 @@ private fun LazyColumnWithSpells(
     modifier: Modifier,
 ) {
     LazyColumn(modifier) {
-        items(spells) { spell ->
+        items(
+            items = spells,
+            key = {
+                it.name
+            }
+        ) { spell ->
 
             val iconForSwipeAction =
                 if (spell.favourite) Icons.Default.Delete else Icons.Default.Favorite
@@ -191,10 +201,11 @@ private fun LazyColumnWithSpells(
                 background = colorForSwipeAction,
                 onSwipe = {
                     viewModel.updateFavouritesStatus(spell, !spell.favourite)
-                }
+                },
+                weight = 0.1
             )
 
-            SwipeableActionsBox(endActions = listOf(action)) {
+            SwipeableActionsBox(endActions = listOf(action), swipeThreshold = 30.dp) {
                 ItemForList(
                     spell,
                     modifier = Modifier

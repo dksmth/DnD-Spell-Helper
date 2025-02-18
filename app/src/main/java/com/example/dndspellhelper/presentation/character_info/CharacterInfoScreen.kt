@@ -68,6 +68,7 @@ fun CharacterInfoScreen(navController: NavController, viewModel: CharactersViewM
     val defaultSpellSlots = viewModel.defaultSpellSlots
     var expanded by remember { mutableStateOf(false) }
     var showDeleteDialog by remember { mutableStateOf(false) }
+    val spellcasting = viewModel.spellcasting
 
     if (character != null) {
 
@@ -153,7 +154,31 @@ fun CharacterInfoScreen(navController: NavController, viewModel: CharactersViewM
 
                 Spacer(Modifier.height(30.dp))
 
-                RefreshSpellIcon(viewModel)
+                Row(
+                    verticalAlignment = CenterVertically,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
+                    if (spellcasting.spells_known != null && spellcasting.spells_known != 0) {
+                        Text(
+                            "Spells known: ${character!!.knownSpells.filter { it.level > 0 }.size} / ${spellcasting.spells_known}",
+                        )
+                    } else {
+                        val maxPrepared =  remember {
+                            character!!.level + character!!.abilityModifier
+                        }
+
+                        Text(
+                            "Spells prepared: ${character!!.knownSpells.size} / $maxPrepared"
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.weight(1f))
+
+                    RefreshSpellIcon(viewModel)
+                }
+
+
 
                 for (i in defaultSpellSlots.indices) {
 
@@ -201,22 +226,16 @@ fun CharacterInfoScreen(navController: NavController, viewModel: CharactersViewM
 
 @Composable
 private fun RefreshSpellIcon(viewModel: CharactersViewModel) {
-    Row(
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Spacer(modifier = Modifier.weight(1f))
-
-        Icon(
-            painter = painterResource(id = R.drawable.moon_icon),
-            contentDescription = null,
-            modifier = Modifier
-                .size(80.dp)
-                .padding(end = 30.dp)
-                .clickable {
-                    viewModel.refreshCharacterSpellSlots()
-                }
-        )
-    }
+    Icon(
+        painter = painterResource(id = R.drawable.moon_icon),
+        contentDescription = null,
+        modifier = Modifier
+            .size(80.dp)
+            .padding(end = 30.dp)
+            .clickable {
+                viewModel.refreshCharacterSpellSlots()
+            }
+    )
 }
 
 @Composable

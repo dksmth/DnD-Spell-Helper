@@ -3,6 +3,7 @@ package com.example.dndspellhelper.data
 import com.example.dndspellhelper.data.local.SpellsDatabase
 import com.example.dndspellhelper.data.remote.SpellsApi
 import com.example.dndspellhelper.data.remote.dto.character_level.ClassLevelDto
+import com.example.dndspellhelper.data.remote.dto.character_level.Spellcasting
 import com.example.dndspellhelper.data.remote.dto.spell.SpellDto
 import com.example.dndspellhelper.models.PlayerCharacter
 import com.example.dndspellhelper.models.Spell
@@ -77,13 +78,20 @@ class SpellsRepository @Inject constructor(
 
     // Spellcasting and spell slots
 
+    suspend fun getSpellcasting(playerCharacter: PlayerCharacter): Spellcasting {
+        return getInfoForClassAndLevelFromAPI(
+            playerCharacter.characterClass.lowercase(),
+            playerCharacter.level
+        ).spellcasting
+    }
+
     suspend fun getSpellSlots(playerCharacter: PlayerCharacter): List<SpellSlot> {
         return getSpellSlots(playerCharacter.characterClass, playerCharacter.level)
     }
 
     private suspend fun getSpellSlots(className: String, level: Int): List<SpellSlot> {
         return if (dao.classLevelInDB(className, level)) {
-            getSpellSlotsFromDatabase(className,level)
+            getSpellSlotsFromDatabase(className, level)
         } else {
             val fromAPI = getInfoForClassAndLevelFromAPI(className, level)
 

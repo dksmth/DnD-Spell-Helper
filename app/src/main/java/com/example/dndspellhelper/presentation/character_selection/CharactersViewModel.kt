@@ -32,6 +32,8 @@ class CharactersViewModel @Inject constructor(private val spellsRepository: Spel
 
     var defaultSpellSlots: List<SpellSlot> = Spellcasting().getSpellcastingPairs()
 
+    var spellcasting = Spellcasting()
+
     var showAddButton = false
 
     init {
@@ -82,9 +84,10 @@ class CharactersViewModel @Inject constructor(private val spellsRepository: Spel
 
     fun setCharacter(character: PlayerCharacter) {
         viewModelScope.launch(Dispatchers.IO) {
-            defaultSpellSlots = spellsRepository.getSpellSlots(character)
-
             _character.emit(character)
+
+            defaultSpellSlots = spellsRepository.getSpellSlots(character)
+            spellcasting = spellsRepository.getSpellcasting(character)
         }
     }
 

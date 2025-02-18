@@ -37,7 +37,6 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             DnDSpellHelperTheme {
-
                 val navController = rememberNavController()
 
                 Scaffold(
@@ -96,7 +95,3 @@ class MainActivity : ComponentActivity() {
         const val SPELL_INFO_FROM_CHARACTER_ROUTE = "spell_info_from_character"
     }
 }
-
-
-
-
